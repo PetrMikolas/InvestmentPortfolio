@@ -1,0 +1,261 @@
+﻿@page "/"
+@using static InvestmentPortfolio.Client.Components.ModalInvestment
+@using InvestmentPortfolio.Client.Exceptions
+@inject NotificationService NotificationService
+@inject IApiService ApiService
+@rendermode InteractiveAuto
+
+<PageTitle>Investiční portfolio</PageTitle>
+
+<div style="max-width:1430px; margin:auto;">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="16px" Class="rz-unselectable-text rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-2 rz-mb-2 rz-mt-6 rz-ms-4 rz-me-4 rz-border-radius-1" Style="min-width:678px; border: var(--rz-grid-cell-border);">
+        <RadzenRow class="rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-1 rz-border-radius-1 rz-background-color-base-100" Style="height:38px; border: var(--rz-grid-cell-border);">
+            Celková suma investic: @_investments.TotalSum.ToString("# ### ### ##0") Kč
+        </RadzenRow>
+        <RadzenButton Shade="Shade.Lighter" Click=@OpenModalInvestmentCreate Text="Nová investice" ButtonStyle="ButtonStyle.Success" title="Otevře okno pro vytvoření nové investice" />
+    </RadzenStack>
+
+    <div class="responsive-columns" style="min-width:715px; ">
+        <LoadingSpinner Visible="@_isVisibleLoadingSpinner" />
+
+        <div style="width:715px; margin-left:auto; margin-right:auto">
+            <PortfolioTable Investments="@_investments.Items"
+                            OnEdit="@OpenModalInvestmentEdit"
+                            OnDelete="@OpenModalDialog" />
+        </div>
+
+        <div style="width:715px; padding:0px 16px 16px 0px; margin:auto">
+            <PortfolioPieChart Investments="@_investments.Items" OnInvestmentSummary="@ViewInvestmentSummary" />
+        </div>
+    </div>
+
+    @foreach (var message in _alertMessages)
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="16px" class="rz-unselectable-text">
+            <RadzenAlert AlertStyle="message.Style" Variant="Variant.Filled" Shade="Shade.Default" Size="AlertSize.Small" class="rz-ms-4 rz-me-4 rz-mt-2 rz-mb-4" Style="min-width:678px;">
+                @message.Text
+            </RadzenAlert>
+        </RadzenStack>
+    }
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="16px" Class="rz-unselectable-text rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-2 rz-mb-6 rz-mt-2 rz-ms-4 rz-me-4 rz-border-radius-1" Style="min-width:678px; border: var(--rz-grid-cell-border);">
+        <RadzenRow class="rz-ps-3 rz-pe-3 rz-pt-2 rz-pb-1 rz-border-radius-1 rz-background-color-base-100" Style="height:38px; border: var(--rz-grid-cell-border);">
+            Investice přepočteny kurzy ČNB ze dne @_investments.ExchangeRates.Date
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <Loader Visible="@_isVisibleLoader" />
+            @if (!_isVisibleLoader)
+            {
+                <RadzenButton Shade="Shade.Lighter" Click=@OpenModalExchangeRates Text="Kurzy" ButtonStyle="ButtonStyle.Primary" title="Zobrazí kurzy ČNB" />
+            }
+            <RadzenButton Shade="Shade.Lighter" Click=@RefreshExchangeRatesAsync Icon="refresh" ButtonStyle="ButtonStyle.Primary" title="Znovu načte kurzy ČNB" />
+        </RadzenStack>
+    </RadzenStack>
+
+    <ModalExchangeRates IsOpen=@_isOpenModalExchangeRates
+                        ExchangeRates="@_investments.ExchangeRates"
+                        OnCancel="@CloseModalExchangeRates" />
+
+    <ModalInvestment IsOpen="@_isOpenModalInvestment"
+                     Type="@_modalInvestmentType"
+                     Investment="@_modalInvestmentData"
+                     ExchangeRates="@_investments.ExchangeRates"
+                     OnSubmit="@SubmitModalInvestment"
+                     OnCancel="@CloseModalInvestment" />
+
+    <ModalDialog IsOpen="@_isOpenModalDialog"
+                 NameInvestment="@_dialogInvestment.Name"
+                 OnClose="@CloseModalDialog" />
+
+    <RadzenComponents />
+</div>
+
+@code {
+    private bool _isVisibleLoadingSpinner = true;
+    private bool _isVisibleLoader;
+    private bool _isOpenModalExchangeRates;
+    private bool _isOpenModalInvestment;
+    private bool _isOpenModalDialog;
+
+    private InvestmentDto? _modalInvestmentData;
+    private InvestmentsDto _investments = new();
+    private Investment _dialogInvestment = new();
+    private ModalInvestmentType _modalInvestmentType;
+    private List<AlertMessage> _alertMessages = [];
+
+    private void OpenModalExchangeRates() =>
+        _isOpenModalExchangeRates = true;
+
+    private void CloseModalExchangeRates() =>
+        _isOpenModalExchangeRates = false;
+
+    private void CloseModalInvestment() =>
+        _isOpenModalInvestment = false;
+
+    private void OpenModalInvestmentCreate()
+    {
+        _modalInvestmentData = new();
+        _modalInvestmentType = ModalInvestmentType.Create;
+        _isOpenModalInvestment = true;
+    }
+
+    private void OpenModalInvestmentEdit(Investment investment)
+    {
+        _modalInvestmentData = new();
+        _modalInvestmentData.Value = investment.Value;
+        _modalInvestmentData.Name = investment.Name;
+        _modalInvestmentData.CurrencyCode = investment.CurrencyCode;
+        _modalInvestmentData.Id = investment.Id;
+
+        _modalInvestmentType = ModalInvestmentType.Edit;
+        _isOpenModalInvestment = true;
+    }
+
+    private void OpenModalDialog(Investment investment)
+    {
+        _dialogInvestment = investment;
+        _isOpenModalDialog = true;
+    }
+
+    private async Task CloseModalDialog(bool isSubmit)
+    {
+        if (isSubmit)
+        {
+            await DeleteInvestmentAsync(_dialogInvestment);
+        }
+
+        _isOpenModalDialog = false;
+    }
+
+    private async Task SubmitModalInvestment(InvestmentDto investment)
+    {
+        ClearAlertMessage();
+
+        try
+        {
+            if (investment.Id != 0)
+            {
+                await ApiService.UpdateInvestmentAsync(investment);
+                ShowNotification("Investice byla editována", investment.Name);
+            }
+            else
+            {
+                await ApiService.SaveInvestmentAsync(investment);
+                ShowNotification("Investice byla uložena", investment.Name);
+            }
+
+            _investments = await ApiService.GetInvestmentsAsync();
+        }
+        catch (Exception ex)
+        {
+            _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
+        }
+
+    }
+
+    private async Task DeleteInvestmentAsync(Investment investment)
+    {
+        ClearAlertMessage();
+
+        try
+        {
+            await ApiService.DeleteInvestmentAsync(investment.Id);
+            ShowNotification("Investice byla vymazána", investment.Name);
+
+            _investments = await ApiService.GetInvestmentsAsync();
+        }
+        catch (Exception ex)
+        {
+            _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
+        }
+    }
+
+    private async Task RefreshExchangeRatesAsync()
+    {
+        _isVisibleLoader = true;
+        ClearAlertMessage();
+
+        try
+        {
+            _investments = await ApiService.GetInvestmentsAsync(true);
+
+            if (_investments.ExchangeRates.Items.Count != 0)
+            {
+                ShowNotification("Kurzy ČNB byly načteny");
+            }
+
+            CheckExistsExchangeRates(_investments);
+        }
+        catch (Exception ex)
+        {
+            _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
+        }
+
+        _isVisibleLoader = false;
+    }
+
+    private void ShowNotification(string summary, string detail = "")
+    {
+        var message = new NotificationMessage()
+            {
+                Style = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);",
+                Severity = NotificationSeverity.Success,
+                Summary = summary,
+                Detail = detail
+            };
+
+        NotificationService.Notify(message);
+    }
+
+    private void ViewInvestmentSummary(string summary)
+    {
+        ClearAlertMessage();
+        _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Info, Text = summary });
+    }
+
+    private void ClearAlertMessage()
+    {
+        _alertMessages.Clear();
+        StateHasChanged();
+    }
+
+    private void CheckExistsExchangeRates(InvestmentsDto investments)
+    {
+        if (_investments.ExchangeRates.Items.Count == 0)
+        {
+            string message = "Nepodařilo se načíst kurzy ČNB, takže investice v cizí měně nejsou přepočteny na Kč a proto jsou v grafu a v celkové sumě započítány pouze investice v Kč.";
+            _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Warning, Text = message });
+            return;
+        }
+
+        var result = investments.Items.Where(i => i.CurrencyCode != "CZK" && investments.ExchangeRates.Items.All(e => e.Code != i.CurrencyCode)).ToList();
+
+        if (result is not null && result.Count != 0)
+        {
+            var curencyCodes = string.Join(", ", result.Select(x => x.CurrencyCode));
+
+            string message = $"V aktuálních kurzech ČNB nebyl nalezen směnný kurz pro kód měny \"{curencyCodes}\", takže investice v této měně nejsou přepočteny na Kč a uvedeny v celkové sumě a v grafu.";
+            _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Warning, Text = message });
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _investments = await ApiService.GetInvestmentsAsync();
+                CheckExistsExchangeRates(_investments);
+            }
+            catch (Exception ex)
+            {
+                _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
+            }
+
+            _isVisibleLoadingSpinner = false;
+
+            StateHasChanged();
+        }
+    }
+}

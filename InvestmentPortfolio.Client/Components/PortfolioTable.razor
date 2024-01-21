@@ -1,0 +1,65 @@
+﻿@using InvestmentPortfolio.Client.Models
+@using Radzen
+@using Radzen.Blazor
+@rendermode InteractiveAuto
+
+@if (Investments is null || Investments.Count == 0) return;
+
+<RadzenDataGrid Data="@Investments" TItem="Investment" GridLines="DataGridGridLines.Both" AllowPaging="true" AllowSorting="true" class="rz-unselectable-text">
+    <Columns>
+
+        <RadzenDataGridColumn TItem="Investment" Property="Name" Title="Název" TextAlign="TextAlign.Center">
+            <Template Context="investment">
+                <div style="text-align:left">
+                    @investment.Name
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Investment" Property="Value" Title="Hodnota" Width="110px" TextAlign="TextAlign.Center">
+            <Template Context="investment">
+                <div style="text-align:right">
+                    @investment.Value.ToString("# ### ##0")
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Investment" Property="CurrencyCode" Title="Měna" Width="77px" TextAlign="TextAlign.Center">
+            <Template Context="investment">
+                <div style="text-align:center">
+                    @investment.CurrencyCode
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Title="Hodnota Kč" Width="122px" TextAlign="TextAlign.Center">
+            <Template Context="investment">
+                <div style="text-align:right">
+                    @investment.ValueCzk.ToString("# ### ### ###")
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Investment" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="96px" Title="Akce">
+            <Template Context="investment">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceEvenly">
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="edit" Variant="Variant.Filled" Size="ButtonSize.Small" title="Editovat" Click="@(() => EditRow(investment))"></RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Filled" Shade="Shade.Lighter" Size="ButtonSize.Small" title="Vymazat" Click="@(() => DeleteRow(investment))"></RadzenButton>
+                </RadzenStack>
+            </Template>
+        </RadzenDataGridColumn>
+
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter] public List<Investment>? Investments { get; set; }
+    [Parameter] public EventCallback<Investment> OnEdit { get; set; }
+    [Parameter] public EventCallback<Investment> OnDelete { get; set; }
+
+    private void EditRow(Investment investment) =>
+        OnEdit.InvokeAsync(investment);
+
+    private void DeleteRow(Investment investment) =>
+        OnDelete.InvokeAsync(investment);
+}

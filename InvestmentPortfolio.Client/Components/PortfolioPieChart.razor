@@ -1,0 +1,44 @@
+﻿@using InvestmentPortfolio.Client.Models
+@using Radzen
+@using Radzen.Blazor
+@rendermode InteractiveAuto
+
+@if (_data.Count == 0) return;
+
+<RadzenChart SeriesClick=@OnSeriesClick Style="min-height:400px;" class="rz-unselectable-text">
+    <RadzenPieSeries Data="@_data" CategoryProperty="NamePercentage" ValueProperty="ValueCzk">
+        <TooltipTemplate Context="data">
+            <span>@data.Name</span>
+        </TooltipTemplate>
+    </RadzenPieSeries>
+</RadzenChart>
+
+@code {
+    [Parameter] public List<Investment>? Investments { get; set; }
+    [Parameter] public EventCallback<string> OnInvestmentSummary { get; set; }
+    private List<Investment> _data = [];
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        string summary = string.Empty;
+        var investment = (Investment)args.Data;
+
+        if (investment.CurrencyCode != "CZK")
+        {
+            summary = $"{investment.Name} \u00BB hodnota {investment.CurrencyCode}: {investment.Value.ToString("# ### ###")} " +
+                      $"\u00BB hodnota Kč: {investment.ValueCzk.ToString("# ### ###")} \u00BB podíl: {investment.Percentage}";
+        }
+        else
+        {
+            summary = $"{investment.Name} \u00BB hodnota Kč: {investment.ValueCzk.ToString("# ### ###")} \u00BB podíl: {investment.Percentage}";
+        }
+
+        OnInvestmentSummary.InvokeAsync(summary);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Investments is not null)
+            _data = Investments.Where(x => x.ValueCzk != 0).ToList();
+    }
+}

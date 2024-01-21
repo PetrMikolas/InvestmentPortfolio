@@ -1,0 +1,135 @@
+﻿@using InvestmentPortfolio.Client.Models
+@using System.Text.RegularExpressions
+@rendermode InteractiveAuto
+
+@if (!IsOpen || Investment is null || ExchangeRates is null) return;
+
+<div class="modal d-flex justify-content-center align-items-center bg-dark bg-opacity-50">
+    <div class="modal-dialog" style="width:340px;">
+        <div class="modal-content" style="user-select:none;">
+            <div class="modal-header bg-light">
+                <h4 class="modal-title">@_caption</h4>
+                <button class="btn-close" @onclick="CancelForm"></button>
+            </div>
+
+            <EditForm Model="Investment" OnValidSubmit="@SubmitForm">
+                <div class="modal-body pb-1">
+                    <DataAnnotationsValidator />
+                    <div class="largebox ">
+                        <div class="divText ">
+
+                            <div class="mb-3 ">
+                                <div class="d-flex">
+                                    <label for="name">Název:</label>&nbsp;
+                                </div>
+                                <InputText id="name" class="form-control" @bind-Value="Investment.Name" maxlength="37" placeholder="vyplňte název" />
+                            </div>
+
+                            <div class="mb-3 ">
+                                <div class="d-flex">
+                                    <label for="value">Hodnota v rozsahu 1 - 100 000 000:</label>&nbsp;
+                                </div>
+                                <input id="value" class="form-control @_validationClass" inputMode="numeric" @bind:event="oninput" @bind:get="_inputValue" @bind:set="OnInput" onfocusout="@(() => SetValidationClass())" />
+                            </div>
+
+                            <div class="mb-3 ">
+                                <div class="d-flex">
+                                    <label for="currencyCode">Kód měny:</label>&nbsp;
+                                </div>
+                                <InputSelect class="form-control" @bind-Value="@Investment.CurrencyCode">
+                                    <option value="" hidden>--- vyberte ze seznamu ---</option>
+                                    <option value="CZK">CZK &nbsp; (Česká republika - koruna)</option>
+                                    @foreach (var exchangeRate in ExchangeRates.Items.OrderBy(x => x.Code))
+                                    {
+                                        <option value="@exchangeRate.Code">@exchangeRate.Code &nbsp; (@exchangeRate.Country - @exchangeRate.Currency)</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light justify-content-start align-items-start">
+                    <button type="submit" class="btn btn-success me-2" style="width:98px" @onclick="SetValidationClass">Uložit</button>
+                    <button type="button" class="btn btn-warning" style="width:98px" title="Vymaže formulář" @onclick="Reset">Resetovat</button>
+                </div>
+            </EditForm>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public ModalInvestmentType Type { get; set; }
+    [Parameter] public InvestmentDto? Investment { get; set; }
+    [Parameter] public ExchangeRates? ExchangeRates { get; set; }
+    [Parameter] public EventCallback<InvestmentDto> OnSubmit { get; set; }
+    [Parameter] public EventCallback<bool> OnCancel { get; set; }
+    private string _caption = string.Empty;
+    private string _inputValue = string.Empty;
+    private string _validationClass = string.Empty;
+
+    private void SubmitForm()
+    {
+        Investment!.Name = Investment.Name.Trim();
+        OnSubmit.InvokeAsync(Investment);
+        OnCancel.InvokeAsync(true);
+    }
+
+    private void CancelForm() =>
+        OnCancel.InvokeAsync(true);
+
+    private void Reset()
+    {
+        Investment = new();
+        _inputValue = "0";
+        _validationClass = string.Empty;
+    }
+
+    private void OnInput(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            _inputValue = "0";
+            Investment!.Value = 0;
+            return;
+        }
+
+        if (value.Length > 11)
+            return;
+
+        var replaceValue = Regex.Replace(value, @"\s", string.Empty);
+
+        if (int.TryParse(replaceValue, out int number))
+        {
+            Investment!.Value = number;
+            _inputValue = number.ToString("# ### ##0").TrimStart();
+        }
+    }
+
+    private void SetValidationClass()
+    {
+        if (Investment!.Value > 0 && Investment.Value <= 100000000)
+        {
+            _validationClass = "modified valid";
+        }
+        else
+        {
+            _validationClass = "invalid";
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        _caption = Type == ModalInvestmentType.Create ? "Nová investice" : "Editovat investici";
+        _inputValue = Investment is not null ? Investment.Value.ToString("# ### ##0").Trim() : "0";
+        _validationClass = string.Empty;
+    }
+
+    public enum ModalInvestmentType
+    {
+        Create, Edit
+    }
+}

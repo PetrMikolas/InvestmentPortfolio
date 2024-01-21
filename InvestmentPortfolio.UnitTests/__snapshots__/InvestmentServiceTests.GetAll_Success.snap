@@ -1,0 +1,51 @@
+﻿{
+  "TotalSum": 67500,
+  "Items": [
+    {
+      "Id": 1,
+      "Name": "Investice CZK",
+      "Value": 22500,
+      "CurrencyCode": "CZK",
+      "ValueCzk": 22500,
+      "Percentage": "33,33 %",
+      "NamePercentage": "Investice CZK (33,33 %)"
+    },
+    {
+      "Id": 2,
+      "Name": "Investice USD",
+      "Value": 1000,
+      "CurrencyCode": "USD",
+      "ValueCzk": 22500,
+      "Percentage": "33,33 %",
+      "NamePercentage": "Investice USD (33,33 %)"
+    },
+    {
+      "Id": 3,
+      "Name": "Investice HUF",
+      "Value": 300000,
+      "CurrencyCode": "HUF",
+      "ValueCzk": 22500,
+      "Percentage": "33,33 %",
+      "NamePercentage": "Investice HUF (33,33 %)"
+    }
+  ],
+  "ExchangeRates": {
+    "Date": "17.01.2024",
+    "Items": [
+      {
+        "Country": "USA",
+        "Currency": "dolar",
+        "Code": "USD",
+        "Amount": 1,
+        "Rate": 22.5
+      },
+      {
+        "Country": "Maďarsko",
+        "Currency": "forint",
+        "Code": "HUF",
+        "Amount": 100,
+        "Rate": 7.5
+      }
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+﻿@using InvestmentPortfolio.Client.Models
+@rendermode InteractiveAuto
+
+@if (!IsOpen) return;
+
+<div class="modal d-flex justify-content-center align-items-center bg-dark bg-opacity-50" @onclick="CancelForm">
+    <div class="modal-dialog" style="max-width: 600px;" @onclick:stopPropagation=true>
+        <div class="modal-content" style="user-select:none">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title me-3">Kurzy devizového trhu - Česká národní banka</h5>
+                <button class="btn-close" @onclick="CancelForm"></button>
+            </div>
+            <div class="modal-body pb-1">
+                @if (ExchangeRates is not null && ExchangeRates.Items.Count != 0)
+                {
+                    <span style="border:1px solid lightgrey; border-radius:3px; padding:3px 10px; background-color:rgb(247, 247, 247)">
+                        Kurzy ze dne: @ExchangeRates.Date
+                    </span>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center">Země</th>
+                                <th style="text-align:center">Měna</th>
+                                <th style="text-align:center">Množství</th>
+                                <th style="text-align:center">Kód</th>
+                                <th style="text-align:center">Kurz</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var exchangRate in ExchangeRates.Items)
+                            {
+                                <tr>
+                                    <td style="padding:1px 12px">@exchangRate.Country</td>
+                                    <td style="padding:1px 12px">@exchangRate.Currency</td>
+                                    <td style="padding:1px 35px; text-align:right">@exchangRate.Amount</td>
+                                    <td style="padding:1px 12px">@exchangRate.Code</td>
+                                    <td style="padding:1px 12px; text-align:right">@exchangRate.Rate</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p style="color:red; text-align:center">Nepodařilo se načíst kurzy ČNB</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public ExchangeRates? ExchangeRates { get; set; }
+    [Parameter] public EventCallback<bool> OnCancel { get; set; }
+
+    private void CancelForm() => OnCancel.InvokeAsync(true);
+}

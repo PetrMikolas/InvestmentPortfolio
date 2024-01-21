@@ -1,0 +1,37 @@
+﻿@using System.Timers
+@implements IDisposable
+
+<span>@currentDateTime</span>
+
+@code {
+	/// <summary>
+	/// Value true displays only the time
+	/// </summary>
+	[Parameter] public bool OnlyTime { get; set; } 
+	private string currentDateTime = string.Empty;
+	private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        StartTimer();
+    }
+
+    private void StartTimer()
+    {
+        timer = new Timer(1000);
+        timer.Enabled = true;
+        timer.AutoReset = true;
+        timer.Elapsed += (sender, e) => UpdateDateTime();
+    }
+
+    private void UpdateDateTime()
+    {
+        currentDateTime = OnlyTime ? DateTime.Now.ToLongTimeString() : DateTime.Now.ToString();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}

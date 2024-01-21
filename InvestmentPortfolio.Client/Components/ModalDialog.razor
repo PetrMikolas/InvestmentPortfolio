@@ -1,0 +1,29 @@
+﻿@if (!IsOpen) return;
+
+<div class="modal d-flex justify-content-center align-items-center bg-dark bg-opacity-50" @onclick="Cancel">
+    <div class="modal-dialog" @onclick:stopPropagation=true>
+        <div class="modal-content" style="user-select:none">
+            <div class="modal-header bg-light">
+                <h4 class="modal-title">Vymazat investici</h4>
+            </div>
+            <div class="modal-body text-center ">
+                <span class="align-middle">@NameInvestment</span>
+                <br />
+                <span class="align-middle">Opravdu chcete vymazat investici?</span>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-danger me-2" style="width:60px" @onclick=@Submit>Ano</button>
+                <button type="button" class="btn btn-secondary" style="width:60px" @onclick="@Cancel">Ne</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string NameInvestment { get; set; } = string.Empty;
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+
+    private Task Cancel() => OnClose.InvokeAsync(false);
+    private Task Submit() => OnClose.InvokeAsync(true);
+}

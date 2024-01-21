@@ -1,0 +1,15 @@
+version: "3.4"
+  
+services:   
+  server:
+    image: investmentportfolio
+    container_name: investmentportfolio
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: InvestmentPortfolio/Dockerfile  
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production       
+    ports:   
+      - "5500:8080"  
+      - "5501:8081"

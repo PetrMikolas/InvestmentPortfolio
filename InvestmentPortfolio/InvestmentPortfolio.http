@@ -1,0 +1,36 @@
+﻿@InvestmentPortfolio_HostAddress = https://localhost:7213
+
+POST {{InvestmentPortfolio_HostAddress}}/investments
+Content-Type: application/json
+
+{
+"name": "byt",
+  "value": 200000,
+  "currency": 0
+}
+
+
+###
+
+GET {{InvestmentPortfolio_HostAddress}}/investments
+
+###
+
+GET {{InvestmentPortfolio_HostAddress}}/investments/2
+
+###
+
+PUT {{InvestmentPortfolio_HostAddress}}/investments/2
+Content-Type: application/json
+
+{  
+  "name": "byt",
+  "value": 45000,
+  "currency": 1
+}
+
+###
+
+GET {{InvestmentPortfolio_HostAddress}}/exchangerates
+
+###

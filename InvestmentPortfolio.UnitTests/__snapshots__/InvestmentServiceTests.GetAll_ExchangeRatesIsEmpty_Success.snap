@@ -1,0 +1,36 @@
+﻿{
+  "TotalSum": 22500,
+  "Items": [
+    {
+      "Id": 1,
+      "Name": "Investice CZK",
+      "Value": 22500,
+      "CurrencyCode": "CZK",
+      "ValueCzk": 22500,
+      "Percentage": "100 %",
+      "NamePercentage": "Investice CZK (100 %)"
+    },
+    {
+      "Id": 2,
+      "Name": "Investice USD",
+      "Value": 1000,
+      "CurrencyCode": "USD",
+      "ValueCzk": 0,
+      "Percentage": "0 %",
+      "NamePercentage": "Investice USD (0 %)"
+    },
+    {
+      "Id": 3,
+      "Name": "Investice HUF",
+      "Value": 300000,
+      "CurrencyCode": "HUF",
+      "ValueCzk": 0,
+      "Percentage": "0 %",
+      "NamePercentage": "Investice HUF (0 %)"
+    }
+  ],
+  "ExchangeRates": {
+    "Date": "",
+    "Items": []
+  }
+}

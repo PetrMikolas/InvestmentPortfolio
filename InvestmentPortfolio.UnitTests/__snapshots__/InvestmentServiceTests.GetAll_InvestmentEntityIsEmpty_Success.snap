@@ -1,0 +1,23 @@
+﻿{
+  "TotalSum": 0,
+  "Items": [],
+  "ExchangeRates": {
+    "Date": "17.01.2024",
+    "Items": [
+      {
+        "Country": "USA",
+        "Currency": "dolar",
+        "Code": "USD",
+        "Amount": 1,
+        "Rate": 22.5
+      },
+      {
+        "Country": "Maďarsko",
+        "Currency": "forint",
+        "Code": "HUF",
+        "Amount": 100,
+        "Rate": 7.5
+      }
+    ]
+  }
+}
