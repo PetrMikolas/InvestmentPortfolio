@@ -4,9 +4,9 @@ namespace InvestmentPortfolio.Helpers;
 
 public static class Helper
 {
-    public static bool IsValidInvestmentDto(InvestmentDto investmentDto, out IResult? result)
+    public static bool IsValidInvestmentDto(InvestmentDto investmentDto, out string error)
     {
-        string error = string.Empty;
+        error = string.Empty;
 
         if (investmentDto.Name.Length <= 0 || investmentDto.Name.Length > 40)
         {
@@ -24,12 +24,10 @@ public static class Helper
         }
 
         if (error != string.Empty)
-        {
-            result = Results.BadRequest(error);
+        {            
             return false;
         }
-
-        result = null;
+                
         return true;
     }
 }

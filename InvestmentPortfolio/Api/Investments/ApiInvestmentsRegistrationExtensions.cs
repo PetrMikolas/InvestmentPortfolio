@@ -24,9 +24,9 @@ public static class ApiInvestmentsRegistrationExtensions
 
         app.MapPost("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken) =>
         {
-            if (!Helper.IsValidInvestmentDto(investmentDto, out IResult? result))
+            if (!Helper.IsValidInvestmentDto(investmentDto, out string error))
             {
-                return result;
+                return Results.BadRequest(error);
             }
             
             var entity = mapper.Map<InvestmentEntity>(investmentDto);
@@ -41,9 +41,14 @@ public static class ApiInvestmentsRegistrationExtensions
 
         app.MapPut("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken) =>
         {
-            if (!Helper.IsValidInvestmentDto(investmentDto, out IResult? result))
+            if (investmentDto.Id <= 0)
             {
-                return result;
+                return Results.BadRequest("ID musí být větší než nula");
+            }
+
+            if (!Helper.IsValidInvestmentDto(investmentDto, out string error))
+            {
+                return Results.BadRequest(error);
             }
 
             try
