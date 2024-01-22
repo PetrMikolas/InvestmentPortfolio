@@ -23,11 +23,6 @@ public static class Helper
             error += $"Parametr <{nameof(investmentDto.Value)}> musí mít hodnotu v rozsahu 1 až 100 000 000.";
         }
 
-        if (error != string.Empty)
-        {            
-            return false;
-        }
-                
-        return true;
+        return error == string.Empty;
     }
 }
