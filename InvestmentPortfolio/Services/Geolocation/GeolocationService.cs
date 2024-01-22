@@ -38,6 +38,6 @@ public class GeolocationService(HttpClient httpClient, IGeolocationRepository ge
         geolocationEntity.Referer = referer;
 
         email.SendObject(geolocationEntity, "Investment portfolio - geolocation");
-        await geolocationRepository.CreateAsync(geolocationEntity, default);
+        await geolocationRepository.CreateAsync(geolocationEntity, cancellationToken);
     }
 }
