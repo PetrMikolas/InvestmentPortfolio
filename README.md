@@ -9,12 +9,12 @@ Naprogramováno v jazyce C# v prostředí Microsoft .NET 8
 - Unit testy - NUnit
 - Integrační testy - NUnit
 
-![Screenshot](InvestmentPortfolio_1.png)
-![Screenshot](InvestmentPortfolio_2.png)
-![Screenshot](InvestmentPortfolio_3.png)
-![Screenshot](InvestmentPortfolio_4.png)
-![Screenshot](InvestmentPortfolio_5.png)
-![Screenshot](InvestmentPortfolio_6.png)
-![Screenshot](InvestmentPortfolio_7.png)
-![Screenshot](InvestmentPortfolio_8.png)
-![Screenshot](InvestmentPortfolio_9.png)
+![Screenshot](Screenshots/InvestmentPortfolio_1.png)
+![Screenshot](Screenshots/InvestmentPortfolio_2.png)
+![Screenshot](Screenshots/InvestmentPortfolio_3.png)
+![Screenshot](Screenshots/InvestmentPortfolio_4.png)
+![Screenshot](Screenshots/InvestmentPortfolio_5.png)
+![Screenshot](Screenshots/InvestmentPortfolio_6.png)
+![Screenshot](Screenshots/InvestmentPortfolio_7.png)
+![Screenshot](Screenshots/InvestmentPortfolio_8.png)
+![Screenshot](Screenshots/InvestmentPortfolio_9.png)
