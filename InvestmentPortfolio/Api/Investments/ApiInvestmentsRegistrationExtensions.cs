@@ -24,7 +24,7 @@ public static class ApiInvestmentsRegistrationExtensions
 
         app.MapPost("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken) =>
         {
-            if (!Helper.ValidateInvestmentDto(investmentDto, out IResult? result))
+            if (!Helper.IsValidInvestmentDto(investmentDto, out IResult? result))
             {
                 return result;
             }
@@ -41,7 +41,7 @@ public static class ApiInvestmentsRegistrationExtensions
 
         app.MapPut("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken) =>
         {
-            if (!Helper.ValidateInvestmentDto(investmentDto, out IResult? result))
+            if (!Helper.IsValidInvestmentDto(investmentDto, out IResult? result))
             {
                 return result;
             }
