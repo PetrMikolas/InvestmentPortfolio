@@ -6,6 +6,7 @@ Naprogramováno v jazyce C# v prostředí Microsoft .NET 8
 
 - App/Client - Blazor Web App 
 - API - Minimal API
+- ApiClient - NSwag
 - Unit testy - NUnit
 - Integrační testy - NUnit
 
