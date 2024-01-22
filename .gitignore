@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /InvestmentPortfolio/appsettings.Development.json
 /InvestmentPortfolio/appsettings.Production.json
+/InvestmentPortfolio/InvestmentPortfolio.http
