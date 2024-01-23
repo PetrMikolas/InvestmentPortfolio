@@ -20,7 +20,6 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
             var entities = await repository.GetAllAsync(cancellationToken);
             var items = entities.Select(mapper.Map<Models.Investment>).ToList();
 
-
             SetValueCzk(items, exchangeRates);
             var totalSum = items.Sum(x => x.ValueCzk);
             SetPercentage(items, totalSum);
@@ -82,13 +81,13 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
 
         if (isRefresh)
         {
-            memoryCache.Remove(INVESTMENTS_CACHE_KEY);
             memoryCache.Remove(key);
         }
 
         var exchangeRates = await memoryCache.GetOrCreateAsync(key, async entry =>
         {
-            entry.SetAbsoluteExpiration(DateTime.Now.AddDays(1));
+            entry.SetAbsoluteExpiration(DateTime.Now.AddMinutes(1));
+            memoryCache.Remove(INVESTMENTS_CACHE_KEY);
             return await exchangeRateService.GetExchangeRatesAsync(cancellationToken);
         }) ?? new ExchangeRates();
 
