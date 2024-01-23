@@ -86,7 +86,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
 
         var exchangeRates = await memoryCache.GetOrCreateAsync(key, async entry =>
         {
-            entry.SetAbsoluteExpiration(DateTime.Now.AddMinutes(1));
+            entry.SetAbsoluteExpiration(DateTime.Now.AddDays(1));
             memoryCache.Remove(INVESTMENTS_CACHE_KEY);
             return await exchangeRateService.GetExchangeRatesAsync(cancellationToken);
         }) ?? new ExchangeRates();
