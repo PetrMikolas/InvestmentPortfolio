@@ -48,20 +48,10 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
             return value;
         }
 
-        Models.ExchangeRate? exchangeRate = null;
-
         if (exchangeRates.Items.Count != 0)
         {
-            exchangeRate = exchangeRates.Items.Where(x => x.Code == currencyCode).FirstOrDefault();
-        }
-        else
-        {
-            return 0;
-        }
-
-        if (exchangeRate is not null)
-        {
-            return (long)Math.Round(value / exchangeRate.Amount * exchangeRate.Rate);
+            var exchangeRate = exchangeRates.Items.Where(x => x.Code == currencyCode).FirstOrDefault();
+            return exchangeRate is not null ? (long)Math.Round(value / exchangeRate.Amount * exchangeRate.Rate) : 0;
         }
         else
         {
@@ -89,6 +79,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
             entry.SetAbsoluteExpiration(DateTime.Now.AddDays(1));
             memoryCache.Remove(INVESTMENTS_CACHE_KEY);
             return await exchangeRateService.GetExchangeRatesAsync(cancellationToken);
+
         }) ?? new ExchangeRates();
 
         return exchangeRates;
