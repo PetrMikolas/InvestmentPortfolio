@@ -20,3 +20,5 @@ Naprogramováno v jazyce C# v prostředí Microsoft .NET 8
 ![Screenshot](Screenshots/InvestmentPortfolio_7.png)
 ![Screenshot](Screenshots/InvestmentPortfolio_8.png)
 ![Screenshot](Screenshots/InvestmentPortfolio_9.png)
+![Screenshot](Screenshots/InvestmentPortfolio_10.png)
+![Screenshot](Screenshots/InvestmentPortfolio_11.png)
