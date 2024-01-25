@@ -1,18 +1,24 @@
 ﻿@page "/"
 @using static InvestmentPortfolio.Client.Components.ModalInvestment
 @using InvestmentPortfolio.Client.Exceptions
+@using InvestmentPortfolio.Client.Services.Export
 @inject NotificationService NotificationService
 @inject IApiService ApiService
+@inject IExportService ExportService
 @rendermode InteractiveAuto
 
 <PageTitle>Investiční portfolio</PageTitle>
 
 <div style="max-width:1430px; margin:auto;">
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="16px" Class="rz-unselectable-text rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-2 rz-mb-2 rz-mt-6 rz-ms-4 rz-me-4 rz-border-radius-1" Style="min-width:678px; border: var(--rz-grid-cell-border);">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="16px" Class="rz-unselectable-text rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-2 rz-mb-2 rz-mt-6 rz-ms-4 rz-me-4 rz-border-radius-1" Style="min-width:683px; border: var(--rz-grid-cell-border);">
         <RadzenRow class="rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-1 rz-border-radius-1 rz-background-color-base-100" Style="height:38px; border: var(--rz-grid-cell-border);">
             Celková suma investic: @_investments.TotalSum.ToString("# ### ### ##0") Kč
         </RadzenRow>
-        <RadzenButton Shade="Shade.Lighter" Click=@OpenModalInvestmentCreate Text="Nová investice" ButtonStyle="ButtonStyle.Success" title="Otevře okno pro vytvoření nové investice" />
+
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenButton Shade="Shade.Lighter" Text="CSV" Icon="download" ButtonStyle="ButtonStyle.Info" Click="@ExportInvestments" title="Stáhne CSV soubor s investicemi" />
+            <RadzenButton Shade="Shade.Lighter" Click=@OpenModalInvestmentCreate Text="Nová investice" ButtonStyle="ButtonStyle.Success" title="Otevře okno pro vytvoření nové investice" />
+        </RadzenStack>
     </RadzenStack>
 
     <div class="responsive-columns" style="min-width:715px; ">
@@ -32,13 +38,13 @@
     @foreach (var message in _alertMessages)
     {
         <RadzenStack Orientation="Orientation.Horizontal" Gap="16px" class="rz-unselectable-text">
-            <RadzenAlert AlertStyle="message.Style" Variant="Variant.Filled" Shade="Shade.Default" Size="AlertSize.Small" class="rz-ms-4 rz-me-4 rz-mt-2 rz-mb-4" Style="min-width:678px;">
+            <RadzenAlert AlertStyle="message.Style" Variant="Variant.Filled" Shade="Shade.Default" Size="AlertSize.Small" class="rz-ms-4 rz-me-4 rz-mt-2 rz-mb-4" Style="min-width:683px;">
                 @message.Text
             </RadzenAlert>
         </RadzenStack>
     }
 
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="16px" Class="rz-unselectable-text rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-2 rz-mb-6 rz-mt-2 rz-ms-4 rz-me-4 rz-border-radius-1" Style="min-width:678px; border: var(--rz-grid-cell-border);">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="16px" Class="rz-unselectable-text rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-2 rz-mb-6 rz-mt-2 rz-ms-4 rz-me-4 rz-border-radius-1" Style="min-width:683px; border: var(--rz-grid-cell-border);">
         <RadzenRow class="rz-ps-3 rz-pe-3 rz-pt-2 rz-pb-1 rz-border-radius-1 rz-background-color-base-100" Style="height:38px; border: var(--rz-grid-cell-border);">
             Investice přepočteny kurzy ČNB ze dne @_investments.ExchangeRates.Date
         </RadzenRow>
@@ -193,7 +199,7 @@
 
         _isVisibleLoader = false;
     }
-
+        
     private void ShowNotification(string summary, string detail = "")
     {
         var message = new NotificationMessage()
@@ -236,6 +242,19 @@
 
             string message = $"V aktuálních kurzech ČNB nebyl nalezen směnný kurz pro kód měny \"{curencyCodes}\", takže investice v této měně nejsou přepočteny na Kč a uvedeny v celkové sumě a v grafu.";
             _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Warning, Text = message });
+        }
+    }
+
+    private async Task ExportInvestments()
+    {
+        try
+        {
+            await ExportService.DownloadInvestmentsCsvFile(_investments.Items);
+        }
+        catch (Exception ex)
+        {
+            ClearAlertMessage();
+            _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
         }
     }
 

@@ -4,6 +4,7 @@ using InvestmentPortfolio.Repositories;
 using InvestmentPortfolio.Repositories.Entities;
 using InvestmentPortfolio.Services.ExchangeRate;
 using Microsoft.Extensions.Caching.Memory;
+using System.Globalization;
 
 namespace InvestmentPortfolio.Services.Investment;
 
@@ -20,7 +21,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
             var entities = await repository.GetAllAsync(cancellationToken);
             var items = entities.Select(mapper.Map<Models.Investment>).ToList();
 
-            SetValueCzk(items, exchangeRates);
+            SetValueCzk(items, exchangeRates.Items);
             var totalSum = items.Sum(x => x.ValueCzk);
             SetPercentage(items, totalSum);
 
@@ -38,19 +39,19 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         return investments;
     }
 
-    private void SetValueCzk(List<Models.Investment> investmenst, ExchangeRates exchangeRates) =>
+    private void SetValueCzk(List<Models.Investment> investmenst, List<Models.ExchangeRate> exchangeRates) =>
         investmenst.ForEach(item => item.ValueCzk = GetValueCzk(item.Value, item.CurrencyCode, exchangeRates));
 
-    private long GetValueCzk(long value, string currencyCode, ExchangeRates exchangeRates)
+    private long GetValueCzk(long value, string currencyCode, List<Models.ExchangeRate> exchangeRates)
     {
         if (currencyCode == "CZK")
         {
             return value;
         }
 
-        if (exchangeRates.Items.Count != 0)
+        if (exchangeRates.Count != 0)
         {
-            var exchangeRate = exchangeRates.Items.Where(x => x.Code == currencyCode).FirstOrDefault();
+            var exchangeRate = exchangeRates.Where(x => x.Code == currencyCode).FirstOrDefault();
             return exchangeRate is not null ? (long)Math.Round(value / exchangeRate.Amount * exchangeRate.Rate) : 0;
         }
         else
@@ -62,8 +63,12 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
     private void SetPercentage(List<Models.Investment> investments, long totalSum) =>
         investments.ForEach(item => item.Percentage = $"{GetPercentage(item.ValueCzk, totalSum)} %");
 
-    private float GetPercentage(float value, long totalSum) =>
-        (float)Math.Round(value / totalSum * 100, 2);
+    private string GetPercentage(float value, long totalSum)
+    {
+        // NumberDecimalSeparator musí být nastaven kvůli nasazení v Dockeru na Linuxu 
+        var cultureInfo = new CultureInfo("") { NumberFormat = new NumberFormatInfo() { NumberDecimalSeparator = "," } };
+        return Math.Round(value / totalSum * 100, 2).ToString(provider: cultureInfo);
+    }
 
     private async Task<ExchangeRates> GetExchangeRatesAsync(bool isRefresh, CancellationToken cancellationToken)
     {

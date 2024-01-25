@@ -2,6 +2,7 @@ using InvestmentPortfolio.Api.ErrorsClient;
 using InvestmentPortfolio.Api.Geolocation;
 using InvestmentPortfolio.Api.Investments;
 using InvestmentPortfolio.Client.Services.Api;
+using InvestmentPortfolio.Client.Services.Export;
 using InvestmentPortfolio.Components;
 using InvestmentPortfolio.Database;
 using InvestmentPortfolio.Database.Geolocation;
@@ -46,6 +47,7 @@ builder.Services.AddHttpClient<IGeolocationService, GeolocationService>();
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IApiClient, ApiClient>();
+builder.Services.AddScoped<IExportService, ExportService>();
 
 var app = builder.Build();
 
