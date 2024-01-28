@@ -4,6 +4,11 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+ENV TZ=Europe/Prague
+ENV LANG=cs_CZ.UTF-8
+ENV LANGUAGE=cs_CZ.UTF-8
+ENV LC_ALL=cs_CZ.UTF-8
+
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src

@@ -1,6 +1,5 @@
 ﻿using InvestmentPortfolio.Models;
 using InvestmentPortfolio.Services.Email;
-using System.Globalization;
 
 namespace InvestmentPortfolio.Services.ExchangeRate;
 
@@ -14,7 +13,7 @@ public class ExchangeRateService(HttpClient httpClient, IConfiguration configura
         if (string.IsNullOrEmpty(url))
         {
             logger.LogError("Nelze načíst URL API ČNB");
-            email.SendError("Nelze načíst URL API ČNB", typeof(ExchangeRateService), nameof(GetExchangeRatesAsync));               
+            email.SendError("Nelze načíst URL API ČNB", typeof(ExchangeRateService), nameof(GetExchangeRatesAsync));
             return null;
         }
 
@@ -26,7 +25,7 @@ public class ExchangeRateService(HttpClient httpClient, IConfiguration configura
         {
             logger.LogError("Nepodařilo se připojit k API ČNB");
             email.SendError("Nepodařilo se připojit k API ČNB", typeof(ExchangeRateService), nameof(GetExchangeRatesAsync));
-            return null;            
+            return null;
         }
 
         return ReadExchangeRates(data);
@@ -34,9 +33,6 @@ public class ExchangeRateService(HttpClient httpClient, IConfiguration configura
 
     private ExchangeRates? ReadExchangeRates(Stream stream)
     {
-        // NumberDecimalSeparator musí být nastaven kvůli nasazení v Dockeru na Linuxu - parsování float
-        var cultureInfo = new CultureInfo("") { NumberFormat = new NumberFormatInfo() { NumberDecimalSeparator = "," } };
-        
         try
         {
             using var reader = new StreamReader(stream);
@@ -63,7 +59,7 @@ public class ExchangeRateService(HttpClient httpClient, IConfiguration configura
                     Currency = values[1],
                     Amount = int.Parse(values[2]),
                     Code = values[3],
-                    Rate = float.Parse(values[4], cultureInfo)
+                    Rate = float.Parse(values[4])
                 });
             }
 

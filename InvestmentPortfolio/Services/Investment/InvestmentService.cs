@@ -4,7 +4,6 @@ using InvestmentPortfolio.Repositories;
 using InvestmentPortfolio.Repositories.Entities;
 using InvestmentPortfolio.Services.ExchangeRate;
 using Microsoft.Extensions.Caching.Memory;
-using System.Globalization;
 
 namespace InvestmentPortfolio.Services.Investment;
 
@@ -63,12 +62,8 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
     private void SetPercentage(List<Models.Investment> investments, long totalSum) =>
         investments.ForEach(item => item.Percentage = $"{GetPercentage(item.ValueCzk, totalSum)} %");
 
-    private string GetPercentage(float value, long totalSum)
-    {
-        // NumberDecimalSeparator musí být nastaven kvůli nasazení v Dockeru na Linuxu 
-        var cultureInfo = new CultureInfo("") { NumberFormat = new NumberFormatInfo() { NumberDecimalSeparator = "," } };
-        return Math.Round(value / totalSum * 100, 2).ToString(provider: cultureInfo);
-    }
+    private string GetPercentage(float value, long totalSum) =>
+         Math.Round(value / totalSum * 100, 2).ToString();
 
     private async Task<ExchangeRates> GetExchangeRatesAsync(bool isRefresh, CancellationToken cancellationToken)
     {

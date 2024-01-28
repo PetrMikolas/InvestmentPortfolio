@@ -3,7 +3,6 @@ using InvestmentPortfolio.Models;
 using InvestmentPortfolio.Repositories.Entities;
 using InvestmentPortfolio.Repositories.Geolocation;
 using InvestmentPortfolio.Services.Email;
-using System.Globalization;
 using System.Text.Json;
 
 namespace InvestmentPortfolio.Services.Geolocation;
@@ -34,7 +33,7 @@ public class GeolocationService(HttpClient httpClient, IGeolocationRepository ge
         }
 
         var geolocationEntity = mapper.Map<GeolocationEntity>(geolocation);
-        geolocationEntity.LocalDate = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("cs-CZ"));
+        geolocationEntity.LocalDate = DateTime.Now.ToString();
         geolocationEntity.Referer = referer;
 
         email.SendObject(geolocationEntity, "Investment portfolio - geolocation");
