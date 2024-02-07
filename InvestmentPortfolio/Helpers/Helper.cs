@@ -4,9 +4,15 @@ namespace InvestmentPortfolio.Helpers;
 
 public static class Helper
 {
-    public static bool IsValidInvestmentDto(InvestmentDto investmentDto, out string error)
+    public static bool IsValidInvestmentDto(InvestmentDto? investmentDto, out string error)
     {
         error = string.Empty;
+
+        if (investmentDto is null)
+        {
+            error = $"{nameof(investmentDto)} nesmí být null.";
+            return false;
+        }
 
         if (investmentDto.Name.Length <= 0 || investmentDto.Name.Length > 40)
         {

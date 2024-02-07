@@ -43,7 +43,7 @@ public static class ApiInvestmentsRegistrationExtensions
         {
             if (investmentDto.Id <= 0)
             {
-                return Results.BadRequest("ID musí být větší než nula");
+                return Results.BadRequest("ID musí být větší než nula.");
             }
 
             if (!Helper.IsValidInvestmentDto(investmentDto, out string error))
@@ -73,7 +73,7 @@ public static class ApiInvestmentsRegistrationExtensions
         {
             if (id <= 0)
             {
-                return Results.BadRequest("ID musí být větší než nula");
+                return Results.BadRequest("ID musí být větší než nula.");
             }
 
             try
