@@ -9,7 +9,7 @@ public interface IInvestmentService
 
     Task DeleteAsync(int id, CancellationToken cancellationToken);
 
-    Task CreateAsync(InvestmentEntity entity, CancellationToken cancellationToken);
+    Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken);
 
-    Task UpdateAsync(InvestmentEntity entity, CancellationToken cancellationToken);
+    Task UpdateAsync(InvestmentEntity? entity, CancellationToken cancellationToken);
 }

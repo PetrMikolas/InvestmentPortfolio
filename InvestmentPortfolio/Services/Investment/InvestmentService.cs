@@ -18,8 +18,8 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         var investments = await memoryCache.GetOrCreateAsync(INVESTMENTS_CACHE_KEY, async entry =>
         {
             var entities = await repository.GetAllAsync(cancellationToken);
-            var items = entities.Select(mapper.Map<Models.Investment>).ToList();
-
+            List<Models.Investment> items = [.. entities.Select(mapper.Map<Models.Investment>)];
+                   
             SetValueCzk(items, exchangeRates.Items);
             var totalSum = items.Sum(x => x.ValueCzk);
             SetPercentage(items, totalSum);
@@ -91,13 +91,13 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         memoryCache.Remove(INVESTMENTS_CACHE_KEY);
     }
 
-    public async Task CreateAsync(InvestmentEntity entity, CancellationToken cancellationToken)
+    public async Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
         await repository.CreateAsync(entity, cancellationToken);
         memoryCache.Remove(INVESTMENTS_CACHE_KEY);
     }
 
-    public async Task UpdateAsync(InvestmentEntity entity, CancellationToken cancellationToken)
+    public async Task UpdateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
         await repository.UpdateAsync(entity, cancellationToken);
         memoryCache.Remove(INVESTMENTS_CACHE_KEY);

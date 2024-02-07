@@ -8,9 +8,9 @@ public interface IInvestmentRepository
 
     Task<InvestmentEntity> GetByIdAsync(int id, CancellationToken cancellationToken);
 
-    Task CreateAsync(InvestmentEntity entity, CancellationToken cancellationToken);
+    Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken);
 
-    Task UpdateAsync(InvestmentEntity entity, CancellationToken cancellationToken);
+    Task UpdateAsync(InvestmentEntity? entity, CancellationToken cancellationToken);
 
     Task DeleteAsync(int id, CancellationToken cancellationToken);
 }

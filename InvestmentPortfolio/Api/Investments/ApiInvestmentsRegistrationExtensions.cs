@@ -24,14 +24,14 @@ public static class ApiInvestmentsRegistrationExtensions
 
         app.MapPost("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken) =>
         {
-            if (!Helper.IsValidInvestmentDto(investmentDto, out string error))
+            if (!Helper.IsValidInvestmentDto(investmentDto, HttpMethod.Post, out string error))
             {
                 return Results.BadRequest(error);
             }
             
             var entity = mapper.Map<InvestmentEntity>(investmentDto);
             await investmentsService.CreateAsync(entity, cancellationToken);
-            return Results.Created($"investments/{entity.Id}", investmentDto);
+            return Results.Created($"investments/{entity?.Id}", investmentDto);
         })
         .WithTags("Investments")
         .WithName("CreateInvestment")
@@ -40,13 +40,8 @@ public static class ApiInvestmentsRegistrationExtensions
         .Produces(StatusCodes.Status400BadRequest);
 
         app.MapPut("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken) =>
-        {
-            if (investmentDto.Id <= 0)
-            {
-                return Results.BadRequest("ID musí být větší než nula.");
-            }
-
-            if (!Helper.IsValidInvestmentDto(investmentDto, out string error))
+        {            
+            if (!Helper.IsValidInvestmentDto(investmentDto, HttpMethod.Put, out string error))
             {
                 return Results.BadRequest(error);
             }
@@ -57,9 +52,9 @@ public static class ApiInvestmentsRegistrationExtensions
                 await investmentsService.UpdateAsync(entita, cancellationToken);
                 return Results.NoContent();
             }
-            catch (EntityNotFoundException)
+            catch (EntityNotFoundException ex)
             {
-                return Results.NotFound();
+                return Results.NotFound(ex.Message);
             }
         })
         .WithTags("Investments")
@@ -73,7 +68,7 @@ public static class ApiInvestmentsRegistrationExtensions
         {
             if (id <= 0)
             {
-                return Results.BadRequest("ID musí být větší než nula.");
+                return Results.BadRequest($"Parametr <{nameof(id)}> musí mít větší hodnotu než nula");
             }
 
             try
@@ -81,9 +76,9 @@ public static class ApiInvestmentsRegistrationExtensions
                 await investmentsService.DeleteAsync(id, cancellationToken);
                 return Results.NoContent();
             }
-            catch (EntityNotFoundException)
+            catch (EntityNotFoundException ex)
             {
-                return Results.NotFound();
+                return Results.NotFound(ex.Message);
             }
         })
         .WithTags("Investments")
