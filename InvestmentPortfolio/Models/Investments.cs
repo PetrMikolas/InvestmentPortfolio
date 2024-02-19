@@ -2,7 +2,11 @@
 
 public class Investments
 {
-    public long TotalSum { get; set; }
+    public long TotalSumCzk { get; set; }
+
+    public int TotalPerformanceCzk { get; set; }
+
+    public float TotalPerformancePercentage { get; set; }
 
     public List<Investment> Items { get; set; } = [];
 

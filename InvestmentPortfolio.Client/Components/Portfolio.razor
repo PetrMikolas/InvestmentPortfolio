@@ -12,12 +12,12 @@
 <div style="max-width:1430px; margin:auto;">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="16px" Class="rz-unselectable-text rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-2 rz-mb-2 rz-mt-6 rz-ms-4 rz-me-4 rz-border-radius-1" Style="min-width:683px; border: var(--rz-grid-cell-border);">
         <RadzenRow class="rz-ps-4 rz-pe-4 rz-pt-2 rz-pb-1 rz-border-radius-1 rz-background-color-base-100" Style="height:38px; border: var(--rz-grid-cell-border);">
-            Celková suma investic: @_investments.TotalSum.ToString("# ### ### ##0") Kč
+            Celková suma investic: @_investments.TotalSumCzk.ToString("# ### ### ##0") Kč
         </RadzenRow>
 
         <RadzenStack Orientation="Orientation.Horizontal">
             <RadzenButton Shade="Shade.Lighter" Text="CSV" Icon="download" ButtonStyle="ButtonStyle.Info" Click="@ExportInvestments" title="Stáhne CSV soubor s investicemi" />
-            <RadzenButton Shade="Shade.Lighter" Click=@OpenModalInvestmentCreate Text="Nová investice" ButtonStyle="ButtonStyle.Success" title="Otevře okno pro vytvoření nové investice" />
+            <RadzenButton Shade="Shade.Lighter" Click=@OpenModalInvestmentCreate Text="Přidat investici" ButtonStyle="ButtonStyle.Success" title="Otevře okno pro přidání investice" />
         </RadzenStack>
     </RadzenStack>
 
@@ -55,6 +55,7 @@
                 <RadzenButton Shade="Shade.Lighter" Click=@OpenModalExchangeRates Text="Kurzy" ButtonStyle="ButtonStyle.Primary" title="Zobrazí kurzy ČNB" />
             }
             <RadzenButton Shade="Shade.Lighter" Click=@RefreshExchangeRatesAsync Icon="refresh" ButtonStyle="ButtonStyle.Primary" title="Znovu načte kurzy ČNB" />
+            <RadzenButton Shade="Shade.Lighter" Click=@OpenModalPerformance Icon="trending_up" ButtonStyle="ButtonStyle.Primary" title="Zobrazí výkonnost investic" Visible=@GetPerformanceButtonVisibility(_investments) />
         </RadzenStack>
     </RadzenStack>
 
@@ -73,6 +74,10 @@
                  NameInvestment="@_dialogInvestment.Name"
                  OnClose="@CloseModalDialog" />
 
+    <ModalPerformance IsOpen=@_isOpenModalPerformance
+                      Investments="@_investments"
+                      OnCancel="@CloseModalPerformance" />
+
     <RadzenComponents />
 </div>
 
@@ -80,6 +85,7 @@
     private bool _isVisibleLoadingSpinner = true;
     private bool _isVisibleLoader;
     private bool _isOpenModalExchangeRates;
+    private bool _isOpenModalPerformance;
     private bool _isOpenModalInvestment;
     private bool _isOpenModalDialog;
 
@@ -89,8 +95,14 @@
     private ModalInvestmentType _modalInvestmentType;
     private List<AlertMessage> _alertMessages = [];
 
+    private void OpenModalPerformance() =>
+        _isOpenModalPerformance = true;
+
     private void OpenModalExchangeRates() =>
         _isOpenModalExchangeRates = true;
+
+    private void CloseModalPerformance() =>
+      _isOpenModalPerformance = false;
 
     private void CloseModalExchangeRates() =>
         _isOpenModalExchangeRates = false;
@@ -199,7 +211,7 @@
 
         _isVisibleLoader = false;
     }
-        
+
     private void ShowNotification(string summary, string detail = "")
     {
         var message = new NotificationMessage()
@@ -243,6 +255,16 @@
             string message = $"V aktuálních kurzech ČNB nebyl nalezen směnný kurz pro kód měny \"{curencyCodes}\", takže investice v této měně nejsou přepočteny na Kč a uvedeny v celkové sumě a v grafu.";
             _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Warning, Text = message });
         }
+    }
+
+    private bool GetPerformanceButtonVisibility(InvestmentsDto investments)
+    {
+        if (investments.Items.Any(x => x.CurrencyCode != "CZK") && investments.ExchangeRates.Items.Count != 0)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private async Task ExportInvestments()

@@ -37,7 +37,7 @@ public sealed class ExportService(IJSRuntime JSRuntime, IApiClient apiClient) : 
 
         foreach (var investment in investments)
         {
-            sb.AppendLine($"{RemoveDiacritics(investment.Name)};{investment.Value};{investment.CurrencyCode};{investment.ValueCzk};{investment.Percentage.Replace("%", "")}");
+            sb.AppendLine($"{RemoveDiacritics(investment.Name)};{investment.Value};{investment.CurrencyCode};{investment.ValueCzk};{investment.PercentageShare}");
         }
 
         return sb.ToString();

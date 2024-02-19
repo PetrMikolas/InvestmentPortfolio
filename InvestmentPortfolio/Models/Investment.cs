@@ -1,4 +1,6 @@
-﻿namespace InvestmentPortfolio.Models;
+﻿using InvestmentPortfolio.Repositories.Entities;
+
+namespace InvestmentPortfolio.Models;
 
 public sealed class Investment
 {
@@ -12,7 +14,15 @@ public sealed class Investment
 
     public long ValueCzk { get; set; }
 
-    public string Percentage { get; set; } = string.Empty;
+    public float PercentageShare { get; set; }
 
-    public string NamePercentage => $"{Name} ({Percentage})";
+    public string NamePercentageShare => $"{Name} ({PercentageShare} %)";
+
+    public DateTimeOffset CreatedDate { get; set; }
+   
+    public long DefaultValueCzk { get; set; }
+
+    public int PerformanceCzk { get; set; }
+
+    public float PerformancePercentage { get; set; }
 }

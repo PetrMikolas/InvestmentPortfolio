@@ -709,8 +709,14 @@ namespace InvestmentPortfolio.Client.Services.Api
     public partial class InvestmentsDto
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("totalSum")]
-        public long TotalSum { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("totalSumCzk")]
+        public long TotalSumCzk { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("totalPerformanceCzk")]
+        public int TotalPerformanceCzk { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("totalPerformancePercentage")]
+        public float TotalPerformancePercentage { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
         [System.ComponentModel.DataAnnotations.Required]
@@ -760,13 +766,25 @@ namespace InvestmentPortfolio.Client.Services.Api
         [System.Text.Json.Serialization.JsonPropertyName("valueCzk")]
         public long ValueCzk { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("percentage")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Percentage { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("percentageShare")]
+        public float PercentageShare { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("namePercentage")]
+        [System.Text.Json.Serialization.JsonPropertyName("namePercentageShare")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string NamePercentage { get; set; }
+        public string NamePercentageShare { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("createdDate")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.DateTime CreatedDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("defaultValueCzk")]
+        public long DefaultValueCzk { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("performanceCzk")]
+        public int PerformanceCzk { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("performancePercentage")]
+        public float PerformancePercentage { get; set; }
 
         public string ToJson()
         {

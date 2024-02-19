@@ -72,7 +72,7 @@ internal class InvestmentTests
         responseData.Items.Should().Subject.First().Name.Should().Be(_firstInvestment.Name);
         responseData.Items.Should().Subject.First().Value.Should().Be(_firstInvestment.Value);
         responseData.Items.Should().Subject.First().CurrencyCode.Should().Be(_firstInvestment.CurrencyCode);
-        responseData.TotalSum.Should().Be(57000);
+        responseData.TotalSumCzk.Should().Be(57000);
         responseData.ExchangeRates.Should().NotBeNull();
         responseData.ExchangeRates.Items.Should().NotBeNullOrEmpty().And.HaveCount(2);
         responseData.ExchangeRates.Date.Should().Be("07.12.2023");

@@ -1,5 +1,7 @@
 ﻿{
-  "TotalSum": 22500,
+  "TotalSumCzk": 22500,
+  "TotalPerformanceCzk": -42750,
+  "TotalPerformancePercentage": -100.0,
   "Items": [
     {
       "Id": 1,
@@ -7,8 +9,12 @@
       "Value": 22500,
       "CurrencyCode": "CZK",
       "ValueCzk": 22500,
-      "Percentage": "100 %",
-      "NamePercentage": "Investice CZK (100 %)"
+      "PercentageShare": 100.0,
+      "NamePercentageShare": "Investice CZK (100 %)",
+      "CreatedDate": "0001-01-01T00:00:00+00:00",
+      "DefaultValueCzk": 0,
+      "PerformanceCzk": 0,
+      "PerformancePercentage": 0.0
     },
     {
       "Id": 2,
@@ -16,8 +22,12 @@
       "Value": 1000,
       "CurrencyCode": "USD",
       "ValueCzk": 0,
-      "Percentage": "0 %",
-      "NamePercentage": "Investice USD (0 %)"
+      "PercentageShare": 0.0,
+      "NamePercentageShare": "Investice USD (0 %)",
+      "CreatedDate": "0001-01-01T00:00:00+00:00",
+      "DefaultValueCzk": 21375,
+      "PerformanceCzk": -21375,
+      "PerformancePercentage": -100.0
     },
     {
       "Id": 3,
@@ -25,8 +35,12 @@
       "Value": 300000,
       "CurrencyCode": "HUF",
       "ValueCzk": 0,
-      "Percentage": "0 %",
-      "NamePercentage": "Investice HUF (0 %)"
+      "PercentageShare": 0.0,
+      "NamePercentageShare": "Investice HUF (0 %)",
+      "CreatedDate": "0001-01-01T00:00:00+00:00",
+      "DefaultValueCzk": 21375,
+      "PerformanceCzk": -21375,
+      "PerformancePercentage": -100.0
     }
   ],
   "ExchangeRates": {

@@ -123,7 +123,7 @@
 
     protected override void OnParametersSet()
     {
-        _caption = Type == ModalInvestmentType.Create ? "Nová investice" : "Editovat investici";
+        _caption = Type == ModalInvestmentType.Create ? "Přidat investici" : "Editovat investici";
         _inputValue = Investment is not null ? Investment.Value.ToString("# ### ##0").Trim() : "0";
         _validationClass = string.Empty;
     }

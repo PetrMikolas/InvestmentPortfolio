@@ -24,14 +24,16 @@ internal static class Utilities
                 Id = 2,
                 Name = "Investice USD",
                 Value = 1000,
-                CurrencyCode = "USD"
+                CurrencyCode = "USD",
+                DefaultValueCzk = 22500
             },
             new InvestmentEntity
             {
                 Id = 3,
                 Name = "Investice EUR",
                 Value = 1000,
-                CurrencyCode = "EUR"
+                CurrencyCode = "EUR",
+                DefaultValueCzk = 24500
             }
         ]);
 

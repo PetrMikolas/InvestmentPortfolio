@@ -6,7 +6,7 @@
 @if (_data.Count == 0) return;
 
 <RadzenChart SeriesClick=@OnSeriesClick Style="min-height:400px;" class="rz-unselectable-text">
-    <RadzenPieSeries Data="@_data" CategoryProperty="NamePercentage" ValueProperty="ValueCzk">
+    <RadzenPieSeries Data="@_data" CategoryProperty="NamePercentageShare" ValueProperty="ValueCzk">
         <TooltipTemplate Context="data">
             <span>@data.Name</span>
         </TooltipTemplate>
@@ -26,11 +26,11 @@
         if (investment.CurrencyCode != "CZK")
         {
             summary = $"{investment.Name} \u00BB hodnota {investment.CurrencyCode}: {investment.Value.ToString("# ### ###")} " +
-                      $"\u00BB hodnota Kč: {investment.ValueCzk.ToString("# ### ###")} \u00BB podíl: {investment.Percentage}";
+                      $"\u00BB hodnota Kč: {investment.ValueCzk.ToString("# ### ###")} \u00BB podíl: {investment.PercentageShare} %";
         }
         else
         {
-            summary = $"{investment.Name} \u00BB hodnota Kč: {investment.ValueCzk.ToString("# ### ###")} \u00BB podíl: {investment.Percentage}";
+            summary = $"{investment.Name} \u00BB hodnota Kč: {investment.ValueCzk.ToString("# ### ###")} \u00BB podíl: {investment.PercentageShare} %";
         }
 
         OnInvestmentSummary.InvokeAsync(summary);

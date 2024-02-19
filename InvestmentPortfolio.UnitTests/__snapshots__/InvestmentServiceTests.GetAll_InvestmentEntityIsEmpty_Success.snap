@@ -1,5 +1,7 @@
 ﻿{
-  "TotalSum": 0,
+  "TotalSumCzk": 0,
+  "TotalPerformanceCzk": 0,
+  "TotalPerformancePercentage": 0.0,
   "Items": [],
   "ExchangeRates": {
     "Date": "17.01.2024",

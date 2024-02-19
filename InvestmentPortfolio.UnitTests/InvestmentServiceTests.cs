@@ -40,8 +40,8 @@ internal class InvestmentServiceTests
         var entities = new List<InvestmentEntity>
         {
             new() { Id = 1, Name = "Investice CZK", Value = 22500, CurrencyCode = "CZK" },
-            new() { Id = 2, Name = "Investice USD", Value = 1000, CurrencyCode = "USD" },
-            new() { Id = 3, Name = "Investice HUF", Value = 300000, CurrencyCode = "HUF" }
+            new() { Id = 2, Name = "Investice USD", Value = 1000, CurrencyCode = "USD", DefaultValueCzk = 21375 },
+            new() { Id = 3, Name = "Investice HUF", Value = 300000, CurrencyCode = "HUF", DefaultValueCzk = 21375  }
         };
 
         var exchangeRates = new ExchangeRates()
@@ -66,7 +66,9 @@ internal class InvestmentServiceTests
 
         response.Should().NotBeNull();
         response.Items.Should().NotBeNullOrEmpty().And.HaveCount(3);
-        response.TotalSum.Should().NotBe(0);
+        response.TotalSumCzk.Should().NotBe(0);
+        response.TotalPerformanceCzk.Should().Be(2250);
+        response.TotalPerformancePercentage.Should().Be(5.26f);
         response.ExchangeRates.Should().NotBeNull();
         response.ExchangeRates.Items.Should().NotBeNullOrEmpty().And.HaveCount(2);
         response.ExchangeRates.Date.Should().NotBeNullOrEmpty();
@@ -80,8 +82,8 @@ internal class InvestmentServiceTests
         var entities = new List<InvestmentEntity>
         {
             new() { Id = 1, Name = "Investice CZK", Value = 22500, CurrencyCode = "CZK" },
-            new() { Id = 2, Name = "Investice USD", Value = 1000, CurrencyCode = "USD" },
-            new() { Id = 3, Name = "Investice HUF", Value = 300000, CurrencyCode = "HUF" }
+            new() { Id = 2, Name = "Investice USD", Value = 1000, CurrencyCode = "USD", DefaultValueCzk = 21375 },
+            new() { Id = 3, Name = "Investice HUF", Value = 300000, CurrencyCode = "HUF", DefaultValueCzk = 21375  }
         };
 
         var exchangeRatesEmpty = new ExchangeRates();
@@ -98,7 +100,9 @@ internal class InvestmentServiceTests
 
         response.Should().NotBeNull();
         response.Items.Should().NotBeNullOrEmpty().And.HaveCount(3);
-        response.TotalSum.Should().Be(22500);
+        response.TotalSumCzk.Should().Be(22500);
+        response.TotalPerformanceCzk.Should().Be(-42750);
+        response.TotalPerformancePercentage.Should().Be(-100);
         response.ExchangeRates.Should().NotBeNull();
         response.ExchangeRates.Items.Should().NotBeNull().And.HaveCount(0);
         response.ExchangeRates.Date.Should().NotBeNull();
@@ -133,7 +137,7 @@ internal class InvestmentServiceTests
 
         response.Should().NotBeNull();
         response.Items.Should().NotBeNull().And.HaveCount(0);
-        response.TotalSum.Should().Be(0);
+        response.TotalSumCzk.Should().Be(0);
         response.ExchangeRates.Should().NotBeNull();
         response.ExchangeRates.Items.Should().NotBeNullOrEmpty().And.HaveCount(2);
         response.ExchangeRates.Date.Should().NotBeNullOrEmpty();
@@ -159,7 +163,7 @@ internal class InvestmentServiceTests
 
         response.Should().NotBeNull();
         response.Items.Should().NotBeNull().And.HaveCount(0);
-        response.TotalSum.Should().Be(0);
+        response.TotalSumCzk.Should().Be(0);
         response.ExchangeRates.Should().NotBeNull();
         response.ExchangeRates.Items.Should().NotBeNull().And.HaveCount(0);
         response.ExchangeRates.Date.Should().NotBeNull();

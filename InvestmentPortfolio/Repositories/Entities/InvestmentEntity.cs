@@ -10,7 +10,9 @@ public class InvestmentEntity
 
     public string CurrencyCode { get; set; } = string.Empty;
 
+    public long? DefaultValueCzk { get; set; }
+
     public DateTimeOffset CreatedDate { get; set; }
 
-    public DateTimeOffset? ModifiedDate { get; set; }
+    public DateTimeOffset? ModifiedDate { get; set; }   
 }

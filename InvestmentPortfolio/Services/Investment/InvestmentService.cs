@@ -19,15 +19,18 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         {
             var entities = await repository.GetAllAsync(cancellationToken);
             List<Models.Investment> items = [.. entities.Select(mapper.Map<Models.Investment>)];
-                   
+
             SetValueCzk(items, exchangeRates.Items);
-            var totalSum = items.Sum(x => x.ValueCzk);
-            SetPercentage(items, totalSum);
+            var totalSumCzk = items.Sum(x => x.ValueCzk);
+            SetPercentageShare(items, totalSumCzk);
+            SetPerformanceValues(items);
 
             var investments = new Investments()
             {
+                TotalSumCzk = totalSumCzk,
+                TotalPerformanceCzk = items.Where(x => x.CurrencyCode != "CZK").Sum(x => x.PerformanceCzk),
+                TotalPerformancePercentage = GetTotalPerformancePercentage(items),
                 Items = items,
-                TotalSum = totalSum,
                 ExchangeRates = exchangeRates
             };
 
@@ -36,6 +39,39 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         }) ?? new Investments();
 
         return investments;
+    }
+
+    private float GetTotalPerformancePercentage(List<Models.Investment> investmenst)
+    {
+        var data = investmenst.Where(x => x.CurrencyCode != "CZK");
+
+        if (!data.Any())
+        {
+            return 0;
+        }
+
+        long totalDefaultValueCzk = 0;
+        long totalValueCzk = 0;
+
+        data.ToList().ForEach(investment =>
+        {
+            totalDefaultValueCzk += investment.DefaultValueCzk;
+            totalValueCzk += investment.ValueCzk;
+        });
+
+        return (float)Math.Round(totalValueCzk / (decimal)totalDefaultValueCzk * 100 - 100, 2);
+    }
+
+    private void SetPerformanceValues(List<Models.Investment> investmenst)
+    {
+        foreach (var investment in investmenst)
+        {
+            if (investment.CurrencyCode != "CZK" && investment.ValueCzk != investment.DefaultValueCzk)
+            {
+                investment.PerformanceCzk = (int)(investment.ValueCzk - investment.DefaultValueCzk);
+                investment.PerformancePercentage = (float)Math.Round((investment.PerformanceCzk / (decimal)investment.DefaultValueCzk) * 100, 2);
+            }
+        }
     }
 
     private void SetValueCzk(List<Models.Investment> investmenst, List<Models.ExchangeRate> exchangeRates) =>
@@ -51,7 +87,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         if (exchangeRates.Count != 0)
         {
             var exchangeRate = exchangeRates.Where(x => x.Code == currencyCode).FirstOrDefault();
-            return exchangeRate is not null ? (long)Math.Round(value / exchangeRate.Amount * exchangeRate.Rate) : 0;
+            return exchangeRate is not null ? (long)Math.Round(value / exchangeRate.Amount * (decimal)exchangeRate.Rate) : 0;
         }
         else
         {
@@ -59,11 +95,18 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         }
     }
 
-    private void SetPercentage(List<Models.Investment> investments, long totalSum) =>
-        investments.ForEach(item => item.Percentage = $"{GetPercentage(item.ValueCzk, totalSum)} %");
+    private void SetPercentageShare(List<Models.Investment> investments, long totalSumCzk) =>
+        investments.ForEach(item => item.PercentageShare = GetPercentageShare(item.ValueCzk, totalSumCzk));
 
-    private string GetPercentage(float value, long totalSum) =>
-         Math.Round(value / totalSum * 100, 2).ToString();
+    private float GetPercentageShare(float valueCzk, long totalSum)
+    {
+        if (valueCzk != 0)
+        {
+            return (float)Math.Round(valueCzk / totalSum * 100, 2);
+        }
+
+        return 0;
+    }
 
     private async Task<ExchangeRates> GetExchangeRatesAsync(bool isRefresh, CancellationToken cancellationToken)
     {
@@ -93,13 +136,37 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
 
     public async Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
+        _ = entity ?? throw new ArgumentNullException(nameof(entity));
+
+        if (entity.CurrencyCode != "CZK")
+        {
+            var exchangeRates = await GetExchangeRatesAsync(true, cancellationToken);
+            entity.DefaultValueCzk = GetValueCzk(entity.Value, entity.CurrencyCode, exchangeRates.Items);
+        }
+
         await repository.CreateAsync(entity, cancellationToken);
         memoryCache.Remove(INVESTMENTS_CACHE_KEY);
     }
 
     public async Task UpdateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
-        await repository.UpdateAsync(entity, cancellationToken);
+        _ = entity ?? throw new ArgumentNullException(nameof(entity));
+
+        var currentInvestment = await repository.GetByIdAsync(entity.Id, cancellationToken);
+
+        if (entity.CurrencyCode != "CZK" && entity.Value != currentInvestment.Value || entity.CurrencyCode != currentInvestment.CurrencyCode)
+        {
+            var exchangeRates = await GetExchangeRatesAsync(true, cancellationToken);
+
+            currentInvestment.CreatedDate = DateTimeOffset.UtcNow;
+            currentInvestment.DefaultValueCzk = GetValueCzk(entity.Value, entity.CurrencyCode, exchangeRates.Items);
+        }
+
+        currentInvestment.Name = entity.Name;
+        currentInvestment.Value = entity.Value;
+        currentInvestment.CurrencyCode = entity.CurrencyCode;
+
+        await repository.UpdateAsync(currentInvestment, cancellationToken);
         memoryCache.Remove(INVESTMENTS_CACHE_KEY);
     }
 }

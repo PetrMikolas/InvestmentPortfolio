@@ -18,7 +18,8 @@ internal sealed class InvestmentDbContext : DbContext
             entity.Property(p => p.Value).IsRequired();
             entity.Property(p => p.CurrencyCode).IsRequired().HasMaxLength(3);
             entity.Property(p => p.CreatedDate).IsRequired();
-            entity.Property(p => p.ModifiedDate).IsRequired(false);        
+            entity.Property(p => p.ModifiedDate).IsRequired(false);  
+            entity.Property(p => p.DefaultValueCzk).IsRequired(false);        
         });
     }
 

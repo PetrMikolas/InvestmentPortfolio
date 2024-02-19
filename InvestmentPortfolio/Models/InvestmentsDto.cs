@@ -2,7 +2,9 @@
 
 public record InvestmentsDto
 (
-    long TotalSum,
+    long TotalSumCzk,
+    int TotalPerformanceCzk,
+    float TotalPerformancePercentage,
     List<Investment> Items,
     ExchangeRates ExchangeRates
 );
