@@ -8,7 +8,7 @@ internal class GeolocationRepository(GeolocationDbContext dbContext) : IGeolocat
 {
     public async Task<List<GeolocationEntity>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await dbContext.Geolocations.AsNoTracking().ToListAsync(cancellationToken);
+        return await dbContext.Geolocations.AsNoTracking().OrderByDescending(e => e.Id).ToListAsync(cancellationToken);
     }
 
     public async Task CreateAsync(GeolocationEntity entity, CancellationToken cancellationToken)

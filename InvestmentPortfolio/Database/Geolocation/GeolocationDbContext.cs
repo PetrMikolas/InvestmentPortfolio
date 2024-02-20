@@ -7,7 +7,7 @@ internal sealed class GeolocationDbContext : DbContext
 {
     public GeolocationDbContext(DbContextOptions<GeolocationDbContext> options) : base(options) { }
 
-    public DbSet<GeolocationEntity> Geolocations => Set<GeolocationEntity>();
+    public DbSet<GeolocationEntity> Geolocations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
