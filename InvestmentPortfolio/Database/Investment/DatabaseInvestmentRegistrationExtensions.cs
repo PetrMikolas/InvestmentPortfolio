@@ -27,8 +27,7 @@ public static class DatabaseInvestmentRegistrationExtensions
         services.AddDbContext<InvestmentDbContext>(options =>
         {
             options.UseSqlServer(connectionString, opts =>
-            {
-                opts.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            {                
                 opts.MigrationsHistoryTable("MigrationHistory_Investment");
             });
         });
@@ -47,8 +46,7 @@ public static class DatabaseInvestmentRegistrationExtensions
             try
             {
                 using var scope = app.Services.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<InvestmentDbContext>();
-                dbContext.Database.EnsureCreated();
+                var dbContext = scope.ServiceProvider.GetRequiredService<InvestmentDbContext>();                
                 dbContext.Database.Migrate();
             }
             catch (Exception ex)

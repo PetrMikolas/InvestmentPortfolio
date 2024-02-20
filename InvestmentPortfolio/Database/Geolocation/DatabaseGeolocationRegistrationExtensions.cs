@@ -25,8 +25,7 @@ public static class DatabaseGeolocationRegistrationExtensions
         services.AddDbContext<GeolocationDbContext>(options =>
         {
             options.UseSqlServer(connectionString, opts =>
-            {
-                opts.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            {                
                 opts.MigrationsHistoryTable("MigrationHistory_Geolocation");
             });
         });
@@ -45,8 +44,7 @@ public static class DatabaseGeolocationRegistrationExtensions
             try
             {
                 using var scope = app.Services.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<GeolocationDbContext>();
-                dbContext.Database.EnsureCreated();
+                var dbContext = scope.ServiceProvider.GetRequiredService<GeolocationDbContext>();                
                 dbContext.Database.Migrate();
             }
             catch (Exception ex)
