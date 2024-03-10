@@ -61,14 +61,14 @@
 
     <ModalExchangeRates IsOpen=@_isOpenModalExchangeRates
                         ExchangeRates="@_investments.ExchangeRates"
-                        OnCancel="@CloseModalExchangeRates" />
+                        OnCancel="@((isOpen) => _isOpenModalExchangeRates = isOpen)" />
 
     <ModalInvestment IsOpen="@_isOpenModalInvestment"
                      Type="@_modalInvestmentType"
                      Investment="@_modalInvestmentData"
                      ExchangeRates="@_investments.ExchangeRates"
                      OnSubmit="@SubmitModalInvestment"
-                     OnCancel="@CloseModalInvestment" />
+                     OnCancel="@((isOpen) => _isOpenModalInvestment = isOpen)" />
 
     <ModalDialog IsOpen="@_isOpenModalDialog"
                  NameInvestment="@_dialogInvestment.Name"
@@ -76,7 +76,7 @@
 
     <ModalPerformance IsOpen=@_isOpenModalPerformance
                       Investments="@_investments"
-                      OnCancel="@CloseModalPerformance" />
+                      OnCancel="@((isOpen) => _isOpenModalPerformance = isOpen)" />    
 
     <RadzenComponents />
 </div>
@@ -100,16 +100,7 @@
 
     private void OpenModalExchangeRates() =>
         _isOpenModalExchangeRates = true;
-
-    private void CloseModalPerformance() =>
-      _isOpenModalPerformance = false;
-
-    private void CloseModalExchangeRates() =>
-        _isOpenModalExchangeRates = false;
-
-    private void CloseModalInvestment() =>
-        _isOpenModalInvestment = false;
-
+    
     private void OpenModalInvestmentCreate()
     {
         _modalInvestmentData = new();
@@ -168,7 +159,6 @@
         {
             _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
         }
-
     }
 
     private async Task DeleteInvestmentAsync(Investment investment)

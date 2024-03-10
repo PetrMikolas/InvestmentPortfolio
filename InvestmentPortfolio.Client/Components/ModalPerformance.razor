@@ -145,7 +145,7 @@
         return value.ToString();
     }
 
-    private void CancelForm() => OnCancel.InvokeAsync(true);
+    private void CancelForm() => OnCancel.InvokeAsync();
 
     protected override void OnParametersSet()
     {

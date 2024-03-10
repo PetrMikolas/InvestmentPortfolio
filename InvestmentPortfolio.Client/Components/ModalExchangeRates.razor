@@ -55,5 +55,5 @@
     [Parameter] public ExchangeRates? ExchangeRates { get; set; }
     [Parameter] public EventCallback<bool> OnCancel { get; set; }
 
-    private void CancelForm() => OnCancel.InvokeAsync(true);
+    private void CancelForm() => OnCancel.InvokeAsync();
 }

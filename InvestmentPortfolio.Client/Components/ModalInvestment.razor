@@ -67,6 +67,7 @@
     [Parameter] public ExchangeRates? ExchangeRates { get; set; }
     [Parameter] public EventCallback<InvestmentDto> OnSubmit { get; set; }
     [Parameter] public EventCallback<bool> OnCancel { get; set; }
+
     private string _caption = string.Empty;
     private string _inputValue = string.Empty;
     private string _validationClass = string.Empty;
@@ -75,11 +76,11 @@
     {
         Investment!.Name = Investment.Name.Trim();
         OnSubmit.InvokeAsync(Investment);
-        OnCancel.InvokeAsync(true);
+        CancelForm();
     }
 
     private void CancelForm() =>
-        OnCancel.InvokeAsync(true);
+        OnCancel.InvokeAsync();
 
     private void Reset()
     {
