@@ -42,6 +42,12 @@
 		<InternalsVisibleTo Include="InvestmentPortfolio.UnitTests" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="appsettings.IntegrationTests.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 	<PropertyGroup>
 		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
 	</PropertyGroup>

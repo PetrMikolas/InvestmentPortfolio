@@ -12,9 +12,15 @@ ENV LC_ALL=cs_CZ.UTF-8
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["InvestmentPortfolio/InvestmentPortfolio.csproj", "InvestmentPortfolio/"]
-COPY ["InvestmentPortfolio.Client/InvestmentPortfolio.Client.csproj", "InvestmentPortfolio.Client/"]
+COPY . .
 RUN dotnet restore "./InvestmentPortfolio/./InvestmentPortfolio.csproj"
+
+# running unit tests
+RUN LANG=cs_CZ.UTF-8 dotnet test InvestmentPortfolio.UnitTests --verbosity quiet
+
+# running integration tests
+RUN LANG=cs_CZ.UTF-8 dotnet test InvestmentPortfolio.IntegrationTests --verbosity quiet
+
 COPY . .
 WORKDIR "/src/InvestmentPortfolio"
 RUN dotnet build "./InvestmentPortfolio.csproj" -c $BUILD_CONFIGURATION -o /app/build
