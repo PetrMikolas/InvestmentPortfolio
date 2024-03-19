@@ -57,7 +57,7 @@ public static class Helper
 
         if (string.IsNullOrEmpty(value))
         {
-            logger.LogWarning($"Hodnota proměnné prostředí {environmentVariableName} není nastavena. Použita výchozí hodnota: {defaultValue}");
+            logger.LogInformation($"Hodnota proměnné prostředí {environmentVariableName} není nastavena. Použita výchozí hodnota: {defaultValue}");
             return defaultValue;
         }
 
