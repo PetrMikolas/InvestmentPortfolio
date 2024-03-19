@@ -5,8 +5,6 @@ EXPOSE 8080
 EXPOSE 8081
 
 ENV TZ=Europe/Prague
-ENV LANG=cs_CZ.UTF-8
-ENV LANGUAGE=cs_CZ.UTF-8
 ENV LC_ALL=cs_CZ.UTF-8
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -16,10 +14,10 @@ COPY . .
 RUN dotnet restore "./InvestmentPortfolio/./InvestmentPortfolio.csproj"
 
 # running unit tests
-RUN LANG=cs_CZ.UTF-8 dotnet test InvestmentPortfolio.UnitTests --verbosity quiet
+RUN LANG=cs_CZ.UTF-8 IS_RUNNING_AUTOMATED_TEST=true dotnet test InvestmentPortfolio.UnitTests --verbosity quiet
 
 # running integration tests
-RUN LANG=cs_CZ.UTF-8 dotnet test InvestmentPortfolio.IntegrationTests --verbosity quiet
+RUN LANG=cs_CZ.UTF-8 IS_RUNNING_AUTOMATED_TEST=true dotnet test InvestmentPortfolio.IntegrationTests --verbosity quiet
 
 COPY . .
 WORKDIR "/src/InvestmentPortfolio"

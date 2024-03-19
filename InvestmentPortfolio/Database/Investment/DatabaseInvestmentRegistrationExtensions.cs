@@ -1,4 +1,5 @@
 ﻿using InvestmentPortfolio.Database.Investment;
+using InvestmentPortfolio.Helpers;
 using InvestmentPortfolio.Repositories;
 using InvestmentPortfolio.Repositories.Investment;
 using InvestmentPortfolio.Services.Email;
@@ -41,7 +42,9 @@ public static class DatabaseInvestmentRegistrationExtensions
 
     public static WebApplication UseDatabaseInvestment(this WebApplication app, IEmailService email)
     {
-        if (app.Environment.EnvironmentName != "IntegrationTests")
+        var isRunningAutomatedTest = Helper.ParseBoolEnvironmentVariable("IS_RUNNING_AUTOMATED_TEST");
+
+        if (app.Environment.EnvironmentName != "IntegrationTests" && !isRunningAutomatedTest)
         {
             try
             {

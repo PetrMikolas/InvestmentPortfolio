@@ -1,4 +1,5 @@
-﻿using InvestmentPortfolio.Repositories.Geolocation;
+﻿using InvestmentPortfolio.Helpers;
+using InvestmentPortfolio.Repositories.Geolocation;
 using InvestmentPortfolio.Services.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -39,7 +40,9 @@ public static class DatabaseGeolocationRegistrationExtensions
 
     public static WebApplication UseDatabaseGeolocation(this WebApplication app, IEmailService email)
     {
-        if (app.Environment.EnvironmentName != "IntegrationTests")
+        var isRunningAutomatedTest = Helper.ParseBoolEnvironmentVariable("IS_RUNNING_AUTOMATED_TEST");
+
+        if (app.Environment.EnvironmentName != "IntegrationTests" && !isRunningAutomatedTest)
         {
             try
             {

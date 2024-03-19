@@ -49,4 +49,24 @@ public static class Helper
 
         return error == string.Empty;
     }
+
+    public static bool ParseBoolEnvironmentVariable(string environmentVariableName, bool defaultValue = false)
+    {
+        ILogger logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger(nameof(ParseBoolEnvironmentVariable));
+        var value = Environment.GetEnvironmentVariable(environmentVariableName);
+
+        if (string.IsNullOrEmpty(value))
+        {
+            logger.LogWarning($"Hodnota proměnné prostředí {environmentVariableName} není nastavena. Použita výchozí hodnota: {defaultValue}");
+            return defaultValue;
+        }
+
+        if (!bool.TryParse(value, out var result))
+        {
+            logger.LogWarning($"Hodnota proměnné prostředí {environmentVariableName} ({value}) není platná boolean hodnota. Použita výchozí hodnota: {defaultValue}");
+            result = defaultValue;
+        }
+
+        return result;
+    }
 }
