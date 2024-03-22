@@ -46,8 +46,11 @@ builder.Services.AddHttpClient<IGeolocationService, GeolocationService>();
 // Client service
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<IApiService, ApiService>();
-builder.Services.AddScoped<IApiClient, ApiClient>();
 builder.Services.AddScoped<IExportService, ExportService>();
+builder.Services.AddHttpClient<IApiClient, ApiClient>(config =>
+{
+    config.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
+});
 
 var app = builder.Build();
 
