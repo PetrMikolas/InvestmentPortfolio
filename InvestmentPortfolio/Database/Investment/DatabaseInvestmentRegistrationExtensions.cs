@@ -19,7 +19,7 @@ public static class DatabaseInvestmentRegistrationExtensions
             string errorMessage = "Nelze získat connection string na připojení databáze Investment";
             Type classType = typeof(DatabaseInvestmentRegistrationExtensions);
 
-            email.SendError(errorMessage, classType, nameof(AddDatabaseInvestment));
+            _ = email.SendErrorAsync(errorMessage, classType, nameof(AddDatabaseInvestment));
             LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger(classType).LogError(errorMessage);
 
             return services;
@@ -54,7 +54,7 @@ public static class DatabaseInvestmentRegistrationExtensions
             }
             catch (Exception ex)
             {
-                email.SendError(ex.ToString());
+                _ = email.SendErrorAsync(ex.ToString());
                 app.Logger.LogError(ex.ToString());
 
                 return app;

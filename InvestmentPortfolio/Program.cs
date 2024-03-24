@@ -12,7 +12,9 @@ using InvestmentPortfolio.Services.Email;
 using InvestmentPortfolio.Services.ExchangeRate;
 using InvestmentPortfolio.Services.Geolocation;
 using InvestmentPortfolio.Services.Investment;
+using Microsoft.Extensions.Options;
 using Radzen;
+using static InvestmentPortfolio.Services.Email.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +26,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services
+    .AddOptions<EmailOptions>()
+    .Bind(builder.Configuration.GetSection(EmailOptions.Key))
+    .ValidateDataAnnotations();
+
 var loggerEmailService = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<EmailService>();
-var emailService = new EmailService(builder.Configuration, loggerEmailService);
+var optionsEmailService = Options.Create(new EmailOptions());
+var emailService = new EmailService(optionsEmailService, loggerEmailService);
 
 // Database
 builder.Services.AddDatabaseInvestment(builder.Configuration, emailService);

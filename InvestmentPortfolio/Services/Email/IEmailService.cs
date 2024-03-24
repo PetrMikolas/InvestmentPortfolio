@@ -1,10 +1,14 @@
-﻿namespace InvestmentPortfolio.Services.Email;
+﻿using MimeKit.Text;
+
+namespace InvestmentPortfolio.Services.Email;
 
 public interface IEmailService
 {
-    void SendError(string errorMessage);
+    Task SendErrorAsync(string errorMessage, CancellationToken cancellationToken = default);
 
-    void SendError(string errorMessage, Type classType, string methodName);
+    Task SendErrorAsync(string errorMessage, Type typeClass, string nameMethod, CancellationToken cancellationToken = default);
 
-    void SendObject<TValue>(TValue value, string subject) where TValue : class;
+    Task SendObjectAsync<TValue>(TValue value, string subject, CancellationToken cancellationToken = default) where TValue : class;
+
+    Task SendEmailAsync(string message, string subject, string address, string name = "", TextFormat textFormat = TextFormat.Plain, CancellationToken cancellationToken = default);
 }

@@ -36,7 +36,7 @@ public class GeolocationService(HttpClient httpClient, IGeolocationRepository ge
         geolocationEntity.LocalDate = DateTime.Now.ToString();
         geolocationEntity.Referer = referer;
 
-        email.SendObject(geolocationEntity, "Investment portfolio - geolocation");
+        _ = email.SendObjectAsync(geolocationEntity, "Investiční portfolio - geolocation");
         await geolocationRepository.CreateAsync(geolocationEntity, cancellationToken);
     }
 }

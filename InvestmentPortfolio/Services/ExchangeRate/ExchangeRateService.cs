@@ -5,45 +5,43 @@ namespace InvestmentPortfolio.Services.ExchangeRate;
 
 public class ExchangeRateService(HttpClient httpClient, IConfiguration configuration, IEmailService email, ILogger<ExchangeRateService> logger) : IExchangeRateService
 {
-    public async Task<ExchangeRates?> GetExchangeRatesAsync(CancellationToken cancellationToken)
+    public async Task<ExchangeRates> GetExchangeRatesAsync(CancellationToken cancellationToken)
     {
-        Stream data;
         var url = configuration["UrlApiCnb"];
+        var exchangeRates = new ExchangeRates();
 
         if (string.IsNullOrEmpty(url))
         {
             logger.LogError("Nelze načíst URL API ČNB");
-            email.SendError("Nelze načíst URL API ČNB", typeof(ExchangeRateService), nameof(GetExchangeRatesAsync));
-            return null;
+            _ = email.SendErrorAsync("Nelze načíst URL API ČNB", typeof(ExchangeRateService), nameof(GetExchangeRatesAsync), cancellationToken);
+            return exchangeRates;
         }
 
         try
         {
-            data = await httpClient.GetStreamAsync(url, cancellationToken);
+            var data = await httpClient.GetStreamAsync(url, cancellationToken);
+            exchangeRates = ReadExchangeRates(data);
         }
-        catch
+        catch (Exception ex)
         {
-            logger.LogError("Nepodařilo se připojit k API ČNB");
-            email.SendError("Nepodařilo se připojit k API ČNB", typeof(ExchangeRateService), nameof(GetExchangeRatesAsync));
-            return null;
+            logger.LogError(ex, "Nepodařilo se připojit k API ČNB");
+            _ = email.SendErrorAsync(ex.ToString(), typeof(ExchangeRateService), nameof(GetExchangeRatesAsync), cancellationToken);
         }
 
-        return ReadExchangeRates(data);
+        return exchangeRates;
     }
 
-    private ExchangeRates? ReadExchangeRates(Stream stream)
+    private ExchangeRates ReadExchangeRates(Stream stream)
     {
+        var exchangeRates = new ExchangeRates();
+
         try
         {
             using var reader = new StreamReader(stream);
 
             // načte 1. řádek tabulky obsahující datum
             var row = reader.ReadLine() ?? throw new ArgumentNullException(nameof(reader), "Nepodařilo se načíst směnné kurzy");
-
-            var exchangeRates = new ExchangeRates
-            {
-                Date = row.Split('#').First().Trim()
-            };
+            exchangeRates.Date = row.Split('#').First().Trim();
 
             // načte 2. řádek tabulky se kterým nepracujeme
             row = reader.ReadLine();
@@ -62,14 +60,13 @@ public class ExchangeRateService(HttpClient httpClient, IConfiguration configura
                     Rate = float.Parse(values[4])
                 });
             }
-
-            return exchangeRates;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            email.SendError(ex.ToString());
-            return null;
+            _ = email.SendErrorAsync(ex.ToString());
         }
+
+        return exchangeRates;
     }
 }

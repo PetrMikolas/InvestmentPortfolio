@@ -17,7 +17,7 @@ public static class DatabaseGeolocationRegistrationExtensions
             string errorMessage = "Nelze získat connection string na připojení databáze Geolocation";
             Type classType = typeof(DatabaseGeolocationRegistrationExtensions);
 
-            email.SendError(errorMessage, classType, nameof(AddDatabaseGeolocation));
+            _ = email.SendErrorAsync(errorMessage, classType, nameof(AddDatabaseGeolocation));
             LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger(classType).LogError(errorMessage);
 
             return services;
@@ -52,7 +52,7 @@ public static class DatabaseGeolocationRegistrationExtensions
             }
             catch (Exception ex)
             {
-                email.SendError(ex.ToString());
+                _ = email.SendErrorAsync(ex.ToString());
                 app.Logger.LogError(ex.ToString());
 
                 return app;

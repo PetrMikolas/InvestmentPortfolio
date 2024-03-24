@@ -13,7 +13,7 @@ public static class ApiErrorsClientRegistrationExtensions
             Console.WriteLine($"Error: {errorMessage}");            
             Console.ResetColor();
 
-            email.SendError(errorMessage);
+            _ = email.SendErrorAsync(errorMessage, cancellationToken);
 
             return Results.NoContent();
         })
