@@ -136,7 +136,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
 
     public async Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
-        _ = entity ?? throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);        
 
         if (entity.CurrencyCode != "CZK")
         {
@@ -150,7 +150,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
 
     public async Task UpdateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
-        _ = entity ?? throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         var currentInvestment = await repository.GetByIdAsync(entity.Id, cancellationToken);
 

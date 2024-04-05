@@ -40,20 +40,22 @@ internal class InvestmentTests
     public async Task GetInvestments_Success()
     {
         // Arrange 
-        var host = new WebHostBuilder().UseKestrel().Configure(app =>
-        {
-            app.Run(async context =>
+        new WebHostBuilder()
+            .UseKestrel()
+            .Configure(app =>
             {
-                if (context.Request.Method == HttpMethods.Get && context.Request.Path == "/dummyapicnb")
+                app.Run(async context =>
                 {
-                    await context.Response.WriteAsync("07.12.2023 #236\n" +
-                                                      "země|měna|množství|kód|kurz\n" +
-                                                      "EMU|euro|1|EUR|24,50\n" +
-                                                      "USA|dolar|1|USD|22,50");
-                }
-            });
-
-        }).Start();              
+                    if (context.Request.Method == HttpMethods.Get && context.Request.Path == "/dummyapicnb")
+                    {
+                        await context.Response.WriteAsync("07.12.2023 #236\n" +
+                                                          "země|měna|množství|kód|kurz\n" +
+                                                          "EMU|euro|1|EUR|24,50\n" +
+                                                          "USA|dolar|1|USD|22,50");
+                    }
+                });
+            })
+            .Start();              
 
         // Act
         var response = await _httpClient.GetAsync($"investments");
