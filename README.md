@@ -6,10 +6,12 @@ Naprogramováno v jazyce C# v prostředí Microsoft .NET 8
 
 - App/Client - Blazor Web App 
 - API - Minimal API
+- API dokumentace - OpenAPI
 - ApiClient - NSwag
 - Databáze - Entity Framework Core code-first
 - Unit testy - NUnit
 - Integrační testy - NUnit
+- Automatizované testy jsou spouštěny pomocí příslušných příkazů v Dockerfile během sestavování obrazu Docker kontejneru
 
 ![Screenshot](Screenshots/InvestmentPortfolio_1.png)
 ![Screenshot](Screenshots/InvestmentPortfolio_2.png)
