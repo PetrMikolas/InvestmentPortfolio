@@ -22,7 +22,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
     {
         var exchangeRates = await GetExchangeRatesAsync(hasRefreshExchangeRates, cancellationToken);
 
-        var investments = await memoryCache.GetOrCreateAsync(INVESTMENTS_CACHE_KEY, async entry =>
+        return await memoryCache.GetOrCreateAsync(INVESTMENTS_CACHE_KEY, async entry =>
         {
             var entities = await repository.GetAllAsync(cancellationToken);
             List<Models.Investment> items = [.. entities.Select(mapper.Map<Models.Investment>)];
@@ -32,7 +32,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
             SetPercentageShare(items, totalSumCzk);
             SetPerformanceValues(items);
 
-            var investments = new Investments()
+            return new Investments()
             {
                 TotalSumCzk = totalSumCzk,
                 TotalPerformanceCzk = items.Where(x => x.CurrencyCode != "CZK").Sum(x => x.PerformanceCzk),
@@ -41,11 +41,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
                 ExchangeRates = exchangeRates
             };
 
-            return investments;
-
         }) ?? new Investments();
-
-        return investments;
     }
 
     /// <summary>
@@ -162,15 +158,13 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
             memoryCache.Remove(key);
         }
 
-        var exchangeRates = await memoryCache.GetOrCreateAsync(key, async entry =>
+        return await memoryCache.GetOrCreateAsync(key, async entry =>
         {
             entry.SetAbsoluteExpiration(DateTime.Now.AddDays(1));
             memoryCache.Remove(INVESTMENTS_CACHE_KEY);
             return await exchangeRateService.GetExchangeRatesAsync(cancellationToken);
 
         }) ?? new ExchangeRates();
-
-        return exchangeRates;
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
@@ -181,7 +175,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
 
     public async Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(entity);        
+        ArgumentNullException.ThrowIfNull(entity);
 
         if (entity.CurrencyCode != "CZK")
         {
