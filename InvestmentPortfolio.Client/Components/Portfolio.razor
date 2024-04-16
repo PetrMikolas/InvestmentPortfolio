@@ -27,7 +27,7 @@
         <div style="width:715px; margin-left:auto; margin-right:auto">
             <PortfolioTable Investments="@_investments.Items"
                             OnEdit="@OpenModalInvestmentEdit"
-                            OnDelete="@OpenModalDialog" />
+                            OnDelete="@OpenDeleteConfirmationDialog" />
         </div>
 
         <div style="width:715px; padding:0px 16px 16px 0px; margin:auto">
@@ -70,13 +70,13 @@
                      OnSubmit="@SubmitModalInvestment"
                      OnCancel="@((isOpen) => _isOpenModalInvestment = isOpen)" />
 
-    <ModalDialog IsOpen="@_isOpenModalDialog"
-                 NameInvestment="@_dialogInvestment.Name"
-                 OnClose="@CloseModalDialog" />
+    <ModalDeleteConfirmationDialog IsOpen="@_isOpenModalDeleteConfirmationDialog"
+                                   NameInvestment="@_dialogInvestment.Name"
+                                   OnClose="@CloseDeleteConfirmationDialog" />
 
     <ModalPerformance IsOpen=@_isOpenModalPerformance
                       Investments="@_investments"
-                      OnCancel="@((isOpen) => _isOpenModalPerformance = isOpen)" />    
+                      OnCancel="@((isOpen) => _isOpenModalPerformance = isOpen)" />
 
     <RadzenComponents />
 </div>
@@ -87,7 +87,7 @@
     private bool _isOpenModalExchangeRates;
     private bool _isOpenModalPerformance;
     private bool _isOpenModalInvestment;
-    private bool _isOpenModalDialog;
+    private bool _isOpenModalDeleteConfirmationDialog;
 
     private InvestmentDto? _modalInvestmentData;
     private InvestmentsDto _investments = new();
@@ -95,12 +95,21 @@
     private ModalInvestmentType _modalInvestmentType;
     private List<AlertMessage> _alertMessages = [];
 
+    /// <summary>
+    /// Opens the modal dialog for displaying investment performance.
+    /// </summary>
     private void OpenModalPerformance() =>
         _isOpenModalPerformance = true;
 
+    /// <summary>
+    /// Opens the modal dialog for displaying exchange rates.
+    /// </summary>
     private void OpenModalExchangeRates() =>
         _isOpenModalExchangeRates = true;
-    
+
+    /// <summary>
+    /// Opens the modal dialog to create a new investment.
+    /// </summary>
     private void OpenModalInvestmentCreate()
     {
         _modalInvestmentData = new();
@@ -108,6 +117,10 @@
         _isOpenModalInvestment = true;
     }
 
+    /// <summary>
+    /// Opens the modal dialog to edit an existing investment.
+    /// </summary>
+    /// <param name="investment">The investment to edit.</param>
     private void OpenModalInvestmentEdit(Investment investment)
     {
         _modalInvestmentData = new();
@@ -120,22 +133,34 @@
         _isOpenModalInvestment = true;
     }
 
-    private void OpenModalDialog(Investment investment)
+    /// <summary>
+    /// Opens a modal dialog to confirm the deletion of an investment.
+    /// </summary>
+    /// <param name="investment">The investment to be deleted.</param>
+    private void OpenDeleteConfirmationDialog(Investment investment)
     {
         _dialogInvestment = investment;
-        _isOpenModalDialog = true;
+        _isOpenModalDeleteConfirmationDialog = true;
     }
 
-    private async Task CloseModalDialog(bool isSubmit)
+    /// <summary>
+    /// Closes the modal dialog and, if submitted, deletes the specified investment.
+    /// </summary>
+    /// <param name="isSubmit">Indicates whether the dialog was submitted.</param>
+    private async Task CloseDeleteConfirmationDialog(bool isSubmit)
     {
         if (isSubmit)
         {
             await DeleteInvestmentAsync(_dialogInvestment);
         }
 
-        _isOpenModalDialog = false;
+        _isOpenModalDeleteConfirmationDialog = false;
     }
 
+    /// <summary>
+    /// Submits the investment data to be saved or updated.
+    /// </summary>
+    /// <param name="investment">The investment data to submit.</param>
     private async Task SubmitModalInvestment(InvestmentDto investment)
     {
         ClearAlertMessage();
@@ -161,6 +186,10 @@
         }
     }
 
+    /// <summary>
+    /// Deletes an investment asynchronously.
+    /// </summary>
+    /// <param name="investment">The investment to delete.</param>
     private async Task DeleteInvestmentAsync(Investment investment)
     {
         ClearAlertMessage();
@@ -178,6 +207,9 @@
         }
     }
 
+    /// <summary>
+    /// Refreshes the exchange rates asynchronously.
+    /// </summary>
     private async Task RefreshExchangeRatesAsync()
     {
         _isVisibleLoader = true;
@@ -202,6 +234,11 @@
         _isVisibleLoader = false;
     }
 
+    /// <summary>
+    /// Displays a notification message.
+    /// </summary>
+    /// <param name="summary">The summary of the notification message.</param>
+    /// <param name="detail">The detailed information of the notification message.</param>
     private void ShowNotification(string summary, string detail = "")
     {
         var message = new NotificationMessage()
@@ -215,18 +252,29 @@
         NotificationService.Notify(message);
     }
 
+    /// <summary>
+    /// Displays the summary of an investment.
+    /// </summary>
+    /// <param name="summary">The summary of the investment.</param>
     private void ViewInvestmentSummary(string summary)
     {
         ClearAlertMessage();
         _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Info, Text = summary });
     }
 
+    /// <summary>
+    /// Clears all alert messages.
+    /// </summary>
     private void ClearAlertMessage()
     {
         _alertMessages.Clear();
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Checks if exchange rates exist and displays a warning if not.
+    /// </summary>
+    /// <param name="investments">The investments data.</param>
     private void CheckExistsExchangeRates(InvestmentsDto investments)
     {
         if (_investments.ExchangeRates.Items.Count == 0)
@@ -247,6 +295,11 @@
         }
     }
 
+    /// <summary>
+    /// Determines the visibility of the performance button.
+    /// </summary>
+    /// <param name="investments">The investments data.</param>
+    /// <returns>True if the button should be visible, otherwise false.</returns>
     private bool GetPerformanceButtonVisibility(InvestmentsDto investments)
     {
         if (investments.Items.Any(x => x.CurrencyCode != "CZK") && investments.ExchangeRates.Items.Count != 0)
@@ -257,6 +310,9 @@
         return false;
     }
 
+    /// <summary>
+    /// Exports investments data to a CSV file.
+    /// </summary>
     private async Task ExportInvestments()
     {
         try
