@@ -56,9 +56,7 @@ builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddHttpClient<IApiClient, ApiClient>(config =>
-{
-    config.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
-});
+    config.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!));
 
 var app = builder.Build();
 
@@ -69,9 +67,9 @@ app.UseWhen(
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseWebAssemblyDebugging(); 
-    app.UseSwagger();   
-    app.UseSwaggerUi();
+    app.UseWebAssemblyDebugging();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 else
 {
