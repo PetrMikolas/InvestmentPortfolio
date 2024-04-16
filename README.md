@@ -9,6 +9,7 @@ Naprogramováno v jazyce C# v prostředí Microsoft .NET 8
 - API dokumentace - OpenAPI
 - ApiClient - NSwag
 - Databáze - Entity Framework Core code-first
+- Sledování chyb - Sentry
 - Unit testy - NUnit
 - Integrační testy - NUnit
 - Automatizované testy jsou spouštěny pomocí příslušných příkazů v Dockerfile během sestavování obrazu Docker kontejneru
