@@ -7,6 +7,13 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace InvestmentPortfolio.Services.Investment;
 
+/// <summary>
+/// Service responsible for managing investments.
+/// </summary>
+/// <param name="repository">The repository for managing investments.</param>
+/// <param name="exchangeRateService">The service for exchange rates.</param>
+/// <param name="mapper">The AutoMapper instance for mapping entities to models.</param>
+/// <param name="memoryCache">The memory cache for caching investments and exchange rates.</param>
 public class InvestmentService(IInvestmentRepository repository, IExchangeRateService exchangeRateService, IMapper mapper, IMemoryCache memoryCache) : IInvestmentService
 {
     private const string INVESTMENTS_CACHE_KEY = "Investments";
@@ -29,7 +36,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
             {
                 TotalSumCzk = totalSumCzk,
                 TotalPerformanceCzk = items.Where(x => x.CurrencyCode != "CZK").Sum(x => x.PerformanceCzk),
-                TotalPerformancePercentage = GetTotalPerformancePercentage(items),
+                TotalPerformancePercentage = CalculateTotalPerformancePercentage(items),
                 Items = items,
                 ExchangeRates = exchangeRates
             };
@@ -41,9 +48,14 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         return investments;
     }
 
-    private float GetTotalPerformancePercentage(List<Models.Investment> investmenst)
+    /// <summary>
+    /// Calculates the total performance percentage of investments.
+    /// </summary>
+    /// <param name="investments">The list of investments.</param>
+    /// <returns>Returns the total performance percentage.</returns>
+    private float CalculateTotalPerformancePercentage(List<Models.Investment> investments)
     {
-        var data = investmenst.Where(x => x.CurrencyCode != "CZK");
+        var data = investments.Where(x => x.CurrencyCode != "CZK");
 
         if (!data.Any())
         {
@@ -62,22 +74,38 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         return (float)Math.Round(totalValueCzk / (decimal)totalDefaultValueCzk * 100 - 100, 2);
     }
 
-    private void SetPerformanceValues(List<Models.Investment> investmenst)
+    /// <summary>
+    /// Sets the performance values for each investment.
+    /// </summary>
+    /// <param name="investments">The list of investments.</param>
+    private void SetPerformanceValues(List<Models.Investment> investments)
     {
-        foreach (var investment in investmenst)
+        foreach (var investment in investments)
         {
             if (investment.CurrencyCode != "CZK" && investment.ValueCzk != investment.DefaultValueCzk)
             {
                 investment.PerformanceCzk = (int)(investment.ValueCzk - investment.DefaultValueCzk);
-                investment.PerformancePercentage = (float)Math.Round((investment.PerformanceCzk / (decimal)investment.DefaultValueCzk) * 100, 2);
+                investment.PerformancePercentage = (float)Math.Round(investment.PerformanceCzk / (decimal)investment.DefaultValueCzk * 100, 2);
             }
         }
     }
 
-    private void SetValueCzk(List<Models.Investment> investmenst, List<Models.ExchangeRate> exchangeRates) =>
-        investmenst.ForEach(item => item.ValueCzk = GetValueCzk(item.Value, item.CurrencyCode, exchangeRates));
+    /// <summary>
+    /// Sets the value in CZK for each investment.
+    /// </summary>
+    /// <param name="investments">The list of investments.</param>
+    /// <param name="exchangeRates">The list of exchange rates.</param>
+    private void SetValueCzk(List<Models.Investment> investments, List<Models.ExchangeRate> exchangeRates) =>
+        investments.ForEach(item => item.ValueCzk = CalculateValueCzk(item.Value, item.CurrencyCode, exchangeRates));
 
-    private long GetValueCzk(long value, string currencyCode, List<Models.ExchangeRate> exchangeRates)
+    /// <summary>
+    /// Calculates the value of an investment in CZK (Czech Koruna) based on its value in the original currency and current exchange rates.
+    /// </summary>
+    /// <param name="value">The value of the investment in the original currency.</param>
+    /// <param name="currencyCode">The currency code of the investment.</param>
+    /// <param name="exchangeRates">The list of exchange rates.</param>
+    /// <returns>Returns the value of the investment in CZK.</returns>
+    private long CalculateValueCzk(long value, string currencyCode, List<Models.ExchangeRate> exchangeRates)
     {
         if (currencyCode == "CZK")
         {
@@ -95,10 +123,21 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         }
     }
 
+    /// <summary>
+    /// Sets the percentage share for each investment.
+    /// </summary>
+    /// <param name="investments">The list of investments.</param>
+    /// <param name="totalSumCzk">The total sum in CZK.</param>
     private void SetPercentageShare(List<Models.Investment> investments, long totalSumCzk) =>
-        investments.ForEach(item => item.PercentageShare = GetPercentageShare(item.ValueCzk, totalSumCzk));
+        investments.ForEach(item => item.PercentageShare = CalculatePercentageShare(item.ValueCzk, totalSumCzk));
 
-    private float GetPercentageShare(float valueCzk, long totalSum)
+    /// <summary>
+    /// Calculates the percentage share of an investment value in relation to the total sum.
+    /// </summary>
+    /// <param name="valueCzk">The value of the investment in CZK.</param>
+    /// <param name="totalSum">The total sum of investments in CZK.</param>
+    /// <returns>Returns the percentage share of the investment value in relation to the total sum.</returns>
+    private float CalculatePercentageShare(float valueCzk, long totalSum)
     {
         if (valueCzk != 0)
         {
@@ -108,6 +147,12 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         return 0;
     }
 
+    /// <summary>
+    /// Gets exchange rates asynchronously.
+    /// </summary>
+    /// <param name="isRefresh">Indicates whether to refresh exchange rates.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>Returns the exchange rates.</returns>
     private async Task<ExchangeRates> GetExchangeRatesAsync(bool isRefresh, CancellationToken cancellationToken)
     {
         string key = "ExchangeRates";
@@ -141,7 +186,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
         if (entity.CurrencyCode != "CZK")
         {
             var exchangeRates = await GetExchangeRatesAsync(true, cancellationToken);
-            entity.DefaultValueCzk = GetValueCzk(entity.Value, entity.CurrencyCode, exchangeRates.Items);
+            entity.DefaultValueCzk = CalculateValueCzk(entity.Value, entity.CurrencyCode, exchangeRates.Items);
         }
 
         await repository.CreateAsync(entity, cancellationToken);
@@ -159,7 +204,7 @@ public class InvestmentService(IInvestmentRepository repository, IExchangeRateSe
             var exchangeRates = await GetExchangeRatesAsync(true, cancellationToken);
 
             currentInvestment.CreatedDate = DateTimeOffset.UtcNow;
-            currentInvestment.DefaultValueCzk = GetValueCzk(entity.Value, entity.CurrencyCode, exchangeRates.Items);
+            currentInvestment.DefaultValueCzk = CalculateValueCzk(entity.Value, entity.CurrencyCode, exchangeRates.Items);
         }
 
         currentInvestment.Name = entity.Name;
