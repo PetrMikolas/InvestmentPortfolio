@@ -91,8 +91,11 @@
                     </RadzenRow>
 
                     <RadzenRow Gap="0" class="rz-ps-3 rz-pe-3 rz-pt-2 rz-pb-1 rz-border-radius-1 rz-background-color-base-100" Style="height:38px; border: var(--rz-grid-cell-border);">
-                        Celková výkonnost: <span style="padding:0 4px; @Helper.GetStyleColorByValue(Investments.TotalPerformanceCzk)">@Investments.TotalPerformanceCzk.ToString("N0")</span> Kč &nbsp;(<span style="padding-right:4px; @Helper.GetStyleColorByValue(Investments.TotalPerformancePercentage)">@Investments.TotalPerformancePercentage</span> %)
-                    </RadzenRow>                  
+                        Celková výkonnost:
+                        <span style="padding:0 0 4px 6px; @Helper.GetStyleColorByValue(Investments.TotalPerformanceCzk)">
+                            @Investments.TotalPerformanceCzk.ToString("N0") Kč &nbsp;(@Investments.TotalPerformancePercentage %)
+                        </span>
+                    </RadzenRow>
                 </RadzenStack>
 
             </div>
