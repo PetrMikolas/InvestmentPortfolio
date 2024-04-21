@@ -1,7 +1,4 @@
-﻿@using InvestmentPortfolio.Client.Models
-@rendermode InteractiveAuto
-
-@if (!IsOpen) return;
+﻿@if (!IsOpen) return;
 
 <div class="modal d-flex justify-content-center align-items-center bg-dark bg-opacity-50" @onclick="CancelForm">
     <div class="modal-dialog" style="max-width: 600px;" @onclick:stopPropagation=true>

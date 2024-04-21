@@ -1,9 +1,4 @@
-﻿@using InvestmentPortfolio.Client.Models
-@using Radzen
-@using Radzen.Blazor
-@rendermode InteractiveAuto
-
-@if (_data.Count == 0) return;
+﻿@if (_data.Count == 0) return;
 
 <RadzenChart SeriesClick=@OnSeriesClick Style="min-height:400px;" class="rz-unselectable-text">
     <RadzenPieSeries Data="@_data" CategoryProperty="NamePercentageShare" ValueProperty="ValueCzk">

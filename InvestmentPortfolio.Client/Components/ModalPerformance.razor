@@ -1,6 +1,4 @@
-﻿@rendermode InteractiveAuto
-
-@if (!IsOpen || Investments is null || _data.Count == 0 || Investments.ExchangeRates.Items.Count == 0) return;
+﻿@if (!IsOpen || Investments is null || _data.Count == 0 || Investments.ExchangeRates.Items.Count == 0) return;
 
 <div class="modal d-flex justify-content-center align-items-center bg-dark bg-opacity-50" @onclick="CancelForm">
     <div class="modal-dialog" style="min-width:1094px;" @onclick:stopPropagation=true>
@@ -34,7 +32,7 @@
                             <HeaderTemplate>Hodnota<br>deviza</HeaderTemplate>
                             <Template Context="investment">
                                 <div style="text-align:right">
-                                    @investment.Value.ToString("# ### ##0")
+                                    @investment.Value.ToString("N0")
                                 </div>
                             </Template>
                         </RadzenDataGridColumn>
@@ -52,7 +50,7 @@
                             <HeaderTemplate>Investovaná<br>částka Kč</HeaderTemplate>
                             <Template Context="investment">
                                 <div style="text-align:right">
-                                    @investment.DefaultValueCzk.ToString("# ### ### ###")
+                                    @investment.DefaultValueCzk.ToString("N0")
                                 </div>
                             </Template>
                         </RadzenDataGridColumn>
@@ -61,7 +59,7 @@
                             <HeaderTemplate>Aktuální<br>hodnota Kč</HeaderTemplate>
                             <Template Context="investment">
                                 <div style="text-align:right">
-                                    @investment.ValueCzk.ToString("# ### ### ###")
+                                    @investment.ValueCzk.ToString("N0")
                                 </div>
                             </Template>
                         </RadzenDataGridColumn>
@@ -69,8 +67,8 @@
                         <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Width="107px" TextAlign="TextAlign.Center">
                             <HeaderTemplate>Výkonnost<br>Kč</HeaderTemplate>
                             <Template Context="investment">
-                                <div style="text-align:right; @GetStyleColorByValue(investment.PerformanceCzk)">
-                                    @investment.PerformanceCzk.ToString("### ##0")
+                                <div style="text-align:right; @Helper.GetStyleColorByValue(investment.PerformanceCzk)">
+                                    @investment.PerformanceCzk.ToString("N0")
                                 </div>
                             </Template>
                         </RadzenDataGridColumn>
@@ -78,7 +76,7 @@
                         <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Width="106px" TextAlign="TextAlign.Center">
                             <HeaderTemplate>Výkonnost<br>%</HeaderTemplate>
                             <Template Context="investment">
-                                <div style="text-align:right; @GetStyleColorByValue(investment.PerformancePercentage)">
+                                <div style="text-align:right; @Helper.GetStyleColorByValue(investment.PerformancePercentage)">
                                     @investment.PerformancePercentage
                                 </div>
                             </Template>
@@ -93,7 +91,7 @@
                     </RadzenRow>
 
                     <RadzenRow Gap="0" class="rz-ps-3 rz-pe-3 rz-pt-2 rz-pb-1 rz-border-radius-1 rz-background-color-base-100" Style="height:38px; border: var(--rz-grid-cell-border);">
-                        Celková výkonnost: <span style="padding:0 4px; @GetStyleColorByValue(Investments.TotalPerformanceCzk)">@Investments.TotalPerformanceCzk.ToString("### ##0")</span> Kč &nbsp;(<span style="padding-right:4px; @GetStyleColorByValue(Investments.TotalPerformancePercentage)">@Investments.TotalPerformancePercentage</span> %)
+                        Celková výkonnost: <span style="padding:0 4px; @Helper.GetStyleColorByValue(Investments.TotalPerformanceCzk)">@Investments.TotalPerformanceCzk.ToString("N0")</span> Kč &nbsp;(<span style="padding-right:4px; @Helper.GetStyleColorByValue(Investments.TotalPerformancePercentage)">@Investments.TotalPerformancePercentage</span> %)
                     </RadzenRow>                  
                 </RadzenStack>
 
@@ -108,42 +106,6 @@
     [Parameter] public EventCallback<bool> OnCancel { get; set; }
 
     private List<Investment> _data = [];
-
-    private string GetStyleColorByValue(float value)
-    {
-        string style = string.Empty;
-
-        if (value > 0)
-        {
-            style = "color:forestgreen";
-        }
-        else if (value < 0)
-        {
-            style = "color:red";
-        }
-
-        return style;
-    }
-
-    private string GetPerformanceCzk(int value)
-    {       
-        if (value > 0)
-        {
-            return $"+{value.ToString("### ##0")}";
-        }        
-
-        return value.ToString("### ##0");
-    }
-
-    private string GetPerformancePercentage(float value)
-    {        
-        if (value > 0)
-        {
-            return $"+{value.ToString()}";
-        }        
-
-        return value.ToString();
-    }
 
     private void CancelForm() => OnCancel.InvokeAsync();
 

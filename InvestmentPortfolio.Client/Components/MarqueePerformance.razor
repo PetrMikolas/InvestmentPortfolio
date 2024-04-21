@@ -1,0 +1,73 @@
+﻿<style>
+    .wrapper {
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 8px 16px;
+        min-width: 683px;
+        margin: 8px 16px 24px;
+        user-select: none
+    }
+
+    .marquee-div {
+        position: relative;
+        height: 21px;
+        overflow: hidden;
+    }
+
+    .marquee-text {
+        position: absolute;
+        font-size: 14px;
+        animation: marquee 50s infinite linear;
+        white-space: nowrap;    
+    }
+
+    @@keyframes marquee {
+        0% {
+            left: 100%;
+        }
+
+        100% {
+            left: 0;
+            transform: translateX(-100%);
+        }
+    }
+</style>
+
+@if (!IsOpen || !_data.Any()) return;
+
+<div class="wrapper" title="Výkonnost investic v závislosti na devizových kuzech">
+    <div class="marquee-div">
+        <span class="marquee-text">
+            Výkonnost investic v závislosti na devizových kurzech:&nbsp;
+
+            @foreach (var investment in _data)
+            {
+                <span>
+                    @investment.Name&nbsp;
+                </span>
+
+                <span style="@Helper.GetStyleColorByValue(investment.PerformanceCzk)">
+                    @investment.PerformanceCzk.ToString("N0") Kč &nbsp;(@investment.PerformancePercentage %)
+                </span>
+
+                @if (investment != _data.Last())
+                {
+                    <span style="margin: 0 8px;">&#x25cf;</span>
+                }
+            }
+        </span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; } = true;
+    [Parameter, EditorRequired] public List<Investment>? Investments { get; set; }
+
+    private List<Investment> _data = [];
+
+    protected override void OnParametersSet()
+    {
+        if (Investments is not null)
+            _data = Investments.Where(x => x.CurrencyCode != "CZK").ToList();
+    }
+}

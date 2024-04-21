@@ -1,9 +1,4 @@
-﻿@using InvestmentPortfolio.Client.Models
-@using Radzen
-@using Radzen.Blazor
-@rendermode InteractiveAuto
-
-@if (Investments is null || Investments.Count == 0) return;
+﻿@if (Investments is null || Investments.Count == 0) return;
 
 <RadzenDataGrid Data="@Investments" TItem="Investment" GridLines="DataGridGridLines.Both" AllowPaging="true" AllowSorting="true" class="rz-unselectable-text">
     <Columns>
@@ -19,7 +14,7 @@
         <RadzenDataGridColumn TItem="Investment" Property="Value" Title="Hodnota" Width="110px" TextAlign="TextAlign.Center">
             <Template Context="investment">
                 <div style="text-align:right">
-                    @investment.Value.ToString("# ### ##0")
+                    @investment.Value.ToString("N0")
                 </div>
             </Template>
         </RadzenDataGridColumn>
@@ -35,7 +30,7 @@
         <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Title="Hodnota Kč" Width="122px" TextAlign="TextAlign.Center">
             <Template Context="investment">
                 <div style="text-align:right">
-                    @investment.ValueCzk.ToString("# ### ### ###")
+                    @investment.ValueCzk.ToString("N0")
                 </div>
             </Template>
         </RadzenDataGridColumn>
