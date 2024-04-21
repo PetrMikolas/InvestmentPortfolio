@@ -38,7 +38,7 @@
     @foreach (var message in _alertMessages)
     {
         <RadzenStack Orientation="Orientation.Horizontal" Gap="16px" class="rz-unselectable-text">
-            <RadzenAlert AlertStyle="message.Style" Variant="Variant.Filled" Shade="Shade.Default" Size="AlertSize.Small" class="rz-ms-4 rz-me-4 rz-mt-2 rz-mb-4" Style="min-width:683px;">
+            <RadzenAlert Close=@(() => _alertMessages.Clear()) AlertStyle="message.Style" Variant="Variant.Filled" Shade="Shade.Default" Size="AlertSize.Small" class="rz-ms-4 rz-me-4 rz-mt-2 rz-mb-4" Style="min-width:683px;">
                 @message.Text
             </RadzenAlert>
         </RadzenStack>
@@ -165,7 +165,7 @@
     /// <param name="investment">The investment data to submit.</param>
     private async Task SubmitModalInvestment(InvestmentDto investment)
     {
-        ClearAlertMessage();
+        _alertMessages.Clear();
 
         try
         {
@@ -194,7 +194,7 @@
     /// <param name="investment">The investment to delete.</param>
     private async Task DeleteInvestmentAsync(Investment investment)
     {
-        ClearAlertMessage();
+        _alertMessages.Clear();
 
         try
         {
@@ -215,7 +215,7 @@
     private async Task RefreshExchangeRatesAsync()
     {
         _isVisibleLoader = true;
-        ClearAlertMessage();
+        _alertMessages.Clear();
 
         try
         {
@@ -260,19 +260,10 @@
     /// <param name="summary">The summary of the investment.</param>
     private void ViewInvestmentSummary(string summary)
     {
-        ClearAlertMessage();
+        _alertMessages.Clear();
         _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Info, Text = summary });
     }
-
-    /// <summary>
-    /// Clears all alert messages.
-    /// </summary>
-    private void ClearAlertMessage()
-    {
-        _alertMessages.Clear();
-        StateHasChanged();
-    }
-
+        
     /// <summary>
     /// Checks if exchange rates exist and displays a warning if not.
     /// </summary>
@@ -323,7 +314,7 @@
         }
         catch (Exception ex)
         {
-            ClearAlertMessage();
+            _alertMessages.Clear();
             _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
         }
     }
