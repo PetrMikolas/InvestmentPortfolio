@@ -33,7 +33,7 @@
     }
 </style>
 
-@if (!IsOpen || !_data.Any()) return;
+@if (!IsVisible || !_data.Any()) return;
 
 <div class="wrapper" title="Výkonnost investic v závislosti na devizových kuzech">
     <div class="marquee-div">
@@ -60,7 +60,7 @@
 </div>
 
 @code {
-    [Parameter] public bool IsOpen { get; set; } = true;
+    [Parameter] public bool IsVisible { get; set; } = true;
     [Parameter, EditorRequired] public List<Investment>? Investments { get; set; }
 
     private List<Investment> _data = [];
