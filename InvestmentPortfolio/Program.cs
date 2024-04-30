@@ -101,7 +101,7 @@ app.UseDatabaseGeolocation(emailService);
 
 // minimal API
 app.MapEndpointsInvestments();
-app.MapEndpointsGeolocation();
-app.MapEndpointsErrorsClient();
+app.MapEndpointsGeolocations();
+app.MapEndpointsClientErrors();
 
 app.Run();

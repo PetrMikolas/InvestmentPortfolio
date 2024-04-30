@@ -3,9 +3,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvestmentPortfolio.Api.ErrorsClient;
 
-public static class ApiErrorsClientRegistrationExtensions
+/// <summary>
+/// Extension method for registering client errors API endpoints.
+/// </summary>
+public static class ApiClientErrorsRegistrationExtensions
 {
-    public static WebApplication MapEndpointsErrorsClient(this WebApplication app)
+    /// <summary>
+    /// Maps an endpoint for reporting client errors to the server.
+    /// </summary>
+    /// <param name="app">The web application.</param>
+    /// <returns>The web application with mapped endpoint for reporting errors.</returns>
+    public static WebApplication MapEndpointsClientErrors(this WebApplication app)
     {
         app.MapPost("errors", ([FromBody] string errorMessage, [FromServices] IEmailService email, CancellationToken cancellationToken) =>
         {

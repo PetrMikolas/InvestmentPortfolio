@@ -4,9 +4,17 @@ using InvestmentPortfolio.Repositories.Geolocation;
 
 namespace InvestmentPortfolio.Api.Geolocation;
 
+/// <summary>
+/// Extension method for registering geolocation API endpoints.
+/// </summary>
 public static class ApiGeolocationRegistrationExtensions
 {
-    public static WebApplication MapEndpointsGeolocation(this WebApplication app)
+    /// <summary>
+    /// Maps the endpoints of the geolocations.
+    /// </summary>
+    /// <param name="app">The WebApplication instance.</param>
+    /// <returns>The web application with mapped endpoints for geolocation operations.</returns>
+    public static WebApplication MapEndpointsGeolocations(this WebApplication app)
     {
         app.MapGet("geolocations", async (IGeolocationRepository repository, IMapper mapper, CancellationToken cancellationToken) =>
         {

@@ -3,7 +3,14 @@ using InvestmentPortfolio.Services.Email;
 
 namespace InvestmentPortfolio.Services.ExchangeRate;
 
-public class ExchangeRateService(HttpClient httpClient, IConfiguration configuration, IEmailService email, ILogger<ExchangeRateService> logger) : IExchangeRateService
+/// <summary>
+/// Service for retrieving exchange rates from the ČNB (Czech National Bank) API, implementing the <see cref="IExchangeRateService"/> interface.
+/// </summary>
+/// <param name="httpClient">The HTTP client used for making requests to the ČNB API.</param>
+/// <param name="configuration">The configuration of the application.</param>
+/// <param name="email">The service for sending email notifications.</param>
+/// <param name="logger">The logger instance for logging.</param>
+internal sealed class ExchangeRateService(HttpClient httpClient, IConfiguration configuration, IEmailService email, ILogger<ExchangeRateService> logger) : IExchangeRateService
 {
     public async Task<ExchangeRates> GetExchangeRatesAsync(CancellationToken cancellationToken)
     {
@@ -31,6 +38,11 @@ public class ExchangeRateService(HttpClient httpClient, IConfiguration configura
         return exchangeRates;
     }
 
+    /// <summary>
+    /// Reads exchange rates from the provided stream.
+    /// </summary>
+    /// <param name="stream">The stream containing exchange rate data.</param>
+    /// <returns>Returns exchange rates.</returns>
     private ExchangeRates ReadExchangeRates(Stream stream)
     {
         var exchangeRates = new ExchangeRates();

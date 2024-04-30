@@ -5,18 +5,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvestmentPortfolio.Repositories.Investment;
 
+/// <summary>
+/// Represents a repository for managing investment entities in the database.
+/// Implements the <see cref="IInvestmentRepository"/> interface.
+/// </summary>
+/// <param name="dbContext">The database context for investment entities.</param>
 internal sealed class InvestmentRepository(InvestmentDbContext dbContext) : IInvestmentRepository
-{
+{    
     public async Task<List<InvestmentEntity>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await dbContext.Investments.AsNoTracking().ToListAsync(cancellationToken);
     }
-
+        
     public async Task<InvestmentEntity> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await dbContext.Investments.FindAsync(id, cancellationToken) ?? throw new EntityNotFoundException(nameof(InvestmentEntity));
     }
-
+        
     public async Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
         _ = entity ?? throw new ArgumentNullException(nameof(entity));
@@ -24,7 +29,7 @@ internal sealed class InvestmentRepository(InvestmentDbContext dbContext) : IInv
         dbContext.Investments.Add(entity);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
-
+        
     public async Task UpdateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
         _ = entity ?? throw new ArgumentNullException(nameof(entity));

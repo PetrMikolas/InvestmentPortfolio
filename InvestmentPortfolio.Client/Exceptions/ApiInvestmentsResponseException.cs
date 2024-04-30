@@ -1,6 +1,8 @@
 ﻿namespace InvestmentPortfolio.Client.Exceptions;
 
-[Serializable]
+/// <summary>
+/// Represents an exception that is thrown when there is an error in the response received from the investments API.
+/// </summary>
 public class ApiInvestmentsResponseException : Exception
 {
     public ApiInvestmentsResponseException() { }

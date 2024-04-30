@@ -2,8 +2,18 @@
 
 namespace InvestmentPortfolio.Helpers;
 
+/// <summary>
+/// Helper methods for investment-related operations.
+/// </summary>
 public static class Helper
 {
+    /// <summary>
+    /// Validates the provided investment data transfer object (DTO) based on the HTTP method.
+    /// </summary>
+    /// <param name="investmentDto">The investment data transfer object to validate.</param>
+    /// <param name="httpMethod">The HTTP method used for the request.</param>
+    /// <param name="error">The error message if validation fails.</param>
+    /// <returns>True if the investment DTO is valid; otherwise, false.</returns>
     public static bool IsValidInvestmentDto(InvestmentDto? investmentDto, HttpMethod httpMethod, out string error)
     {
         error = string.Empty;
@@ -50,6 +60,12 @@ public static class Helper
         return error == string.Empty;
     }
 
+    /// <summary>
+    /// Parses a boolean environment variable with the specified name.
+    /// </summary>
+    /// <param name="environmentVariableName">The name of the environment variable to parse.</param>
+    /// <param name="defaultValue">The default value to return if the environment variable is not set or cannot be parsed.</param>
+    /// <returns>The boolean value of the environment variable if successfully parsed; otherwise, the default value.</returns>
     public static bool ParseBoolEnvironmentVariable(string environmentVariableName, bool defaultValue = false)
     {
         ILogger logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger(nameof(ParseBoolEnvironmentVariable));

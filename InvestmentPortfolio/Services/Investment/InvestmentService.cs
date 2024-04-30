@@ -8,13 +8,13 @@ using Microsoft.Extensions.Caching.Memory;
 namespace InvestmentPortfolio.Services.Investment;
 
 /// <summary>
-/// Service responsible for managing investments.
+/// Service for managing investments based on the <seealso cref="IInvestmentService"/> interface.
 /// </summary>
 /// <param name="repository">The repository for managing investments.</param>
 /// <param name="exchangeRateService">The service for exchange rates.</param>
 /// <param name="mapper">The AutoMapper instance for mapping entities to models.</param>
 /// <param name="memoryCache">The memory cache for caching investments and exchange rates.</param>
-public class InvestmentService(IInvestmentRepository repository, IExchangeRateService exchangeRateService, IMapper mapper, IMemoryCache memoryCache) : IInvestmentService
+internal sealed class InvestmentService(IInvestmentRepository repository, IExchangeRateService exchangeRateService, IMapper mapper, IMemoryCache memoryCache) : IInvestmentService
 {
     private const string INVESTMENTS_CACHE_KEY = "Investments";
 

@@ -7,9 +7,18 @@ using System.Text.Json;
 
 namespace InvestmentPortfolio.Services.Geolocation;
 
-public class GeolocationService(HttpClient httpClient, IGeolocationRepository geolocationRepository, IMapper mapper, IEmailService email) : IGeolocationService
+/// <summary>
+/// Service for retrieving geolocation data based on IP address, implementing the <see cref="IGeolocationService"/> interface.
+/// </summary>
+internal sealed class GeolocationService(HttpClient httpClient, IGeolocationRepository geolocationRepository, IMapper mapper, IEmailService email) : IGeolocationService
 {
-    public async Task GetGeolocationAsync(string ipAddress, string referer, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Asynchronously retrieves geolocation data based on the provided IP address.
+    /// </summary>
+    /// <param name="ipAddress">The IP address to retrieve geolocation data for.</param>
+    /// <param name="referer">The referer URL (optional). Defaults to an empty string.</param>
+    /// <param name="cancellationToken">The cancellation token (optional). Defaults to <see cref="CancellationToken.None"/>.</param>
+    public async Task GetGeolocationAsync(string ipAddress, string referer = "", CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(ipAddress) || ipAddress.Contains("192.168.1."))
         {

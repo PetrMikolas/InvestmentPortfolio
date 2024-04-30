@@ -5,13 +5,23 @@ using System.Text;
 
 namespace InvestmentPortfolio.Client.Services.Export;
 
+/// <summary>
+/// Service for exporting investment data to a CSV file.
+/// Implements the <see cref="IExportService"/> interface.
+/// </summary>
+/// <param name="JSRuntime">The JavaScript runtime instance.</param>
+/// <param name="apiClient">The API client instance.</param>
 public sealed class ExportService(IJSRuntime JSRuntime, IApiClient apiClient) : IExportService
-{
-    private IJSObjectReference? _JSmodule;
-
+{   
+    /// <summary>
+    /// Downloads investment data in CSV format asynchronously.
+    /// </summary>
+    /// <param name="investments">The list of investments to export.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="Exception">Thrown when there is an issue with downloading the CSV file.</exception>
     public async Task DownloadInvestmentsCsvFile(List<Investment> investments)
     {
-        _JSmodule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts.js");
+        IJSObjectReference JSmodule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./scripts.js");
 
         string fileName = $"Investice_{DateTime.Now.ToShortDateString()}.csv";
         byte[] buffer = Encoding.UTF8.GetBytes(GetContentFile(investments));
@@ -20,7 +30,7 @@ public sealed class ExportService(IJSRuntime JSRuntime, IApiClient apiClient) : 
 
         try
         {
-            await _JSmodule.InvokeVoidAsync("downloadFileFromStream", fileName, streamReference);
+            await JSmodule.InvokeVoidAsync("downloadFileFromStream", fileName, streamReference);
         }
         catch (Exception ex)
         {
@@ -29,21 +39,31 @@ public sealed class ExportService(IJSRuntime JSRuntime, IApiClient apiClient) : 
         }
     }
 
+    /// <summary>
+    /// Generates the content for the CSV file.
+    /// </summary>
+    /// <param name="investments">The list of investments.</param>
+    /// <returns>The content of the CSV file as a string.</returns>
     private string GetContentFile(List<Investment> investments)
     {
-        var sb = new StringBuilder();
+        var stringBuilder = new StringBuilder();
 
-        sb.AppendLine("Nazev;Hodnota;Mena;Hodnota Kc;Podil %");
+        stringBuilder.AppendLine("Nazev;Hodnota;Mena;Hodnota Kc;Podil %");
 
         foreach (var investment in investments)
         {
-            sb.AppendLine($"{RemoveDiacritics(investment.Name)};{investment.Value};{investment.CurrencyCode};{investment.ValueCzk};{investment.PercentageShare}");
+            stringBuilder.AppendLine($"{RemoveDiacritics(investment.Name)};{investment.Value};{investment.CurrencyCode};{investment.ValueCzk};{investment.PercentageShare}");
         }
 
-        return sb.ToString();
+        return stringBuilder.ToString();
     }
 
-    public string RemoveDiacritics(string text)
+    /// <summary>
+    /// Removes diacritics from the specified text.
+    /// </summary>
+    /// <param name="text">The text from which to remove diacritics.</param>
+    /// <returns>The text with diacritics removed.</returns>
+    private string RemoveDiacritics(string text)
     {
         var normalizedString = text.Normalize(NormalizationForm.FormD);
         var stringBuilder = new StringBuilder(capacity: normalizedString.Length);

@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvestmentPortfolio.Database.Investment;
 
+/// <summary>
+/// Represents the database context for investments.
+/// </summary>
 internal sealed class InvestmentDbContext : DbContext
 {
     public InvestmentDbContext(DbContextOptions<InvestmentDbContext> options) : base(options) { }

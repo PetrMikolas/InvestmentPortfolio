@@ -776,22 +776,44 @@ namespace InvestmentPortfolio.Client.Services.Api
         }
     }
 
+    /// <summary>
+    /// Data transfer object representing investment information.
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class InvestmentsDto
     {
+        /// <summary>
+        /// Total sum in CZK.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("totalSumCzk")]
         public long TotalSumCzk { get; set; }
 
+        /// <summary>
+        /// Total performance in CZK.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("totalPerformanceCzk")]
         public int TotalPerformanceCzk { get; set; }
+
+        /// <summary>
+        /// Total performance percentage.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("totalPerformancePercentage")]
         public float TotalPerformancePercentage { get; set; }
 
+        /// <summary>
+        /// List of individual investments.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("items")]
         [System.ComponentModel.DataAnnotations.Required]
         public System.Collections.Generic.List<Investment> Items { get; set; } = new System.Collections.Generic.List<Investment>();
+
+        /// <summary>
+        /// Exchange rates information.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("exchangeRates")]
         [System.ComponentModel.DataAnnotations.Required]
@@ -816,43 +838,89 @@ namespace InvestmentPortfolio.Client.Services.Api
 
     }
 
+    /// <summary>
+    /// Represents an investment model.
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Investment
     {
+        /// <summary>
+        /// Gets or sets the unique identifier of the investment.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the investment.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value of the investment.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("value")]
         public int Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the currency code of the investment.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("currencyCode")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string CurrencyCode { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value of the investment in Czech Koruna (CZK).
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("valueCzk")]
         public long ValueCzk { get; set; }
 
+        /// <summary>
+        /// Gets or sets the percentage share of the investment.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("percentageShare")]
         public float PercentageShare { get; set; }
+
+        /// <summary>
+        /// Gets a formatted string representing the name and percentage share of the investment.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("namePercentageShare")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string NamePercentageShare { get; set; }
 
+        /// <summary>
+        /// Gets or sets the date and time when the investment was created.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("createdDate")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTime CreatedDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the default value of the investment in Czech Koruna (CZK).
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("defaultValueCzk")]
         public long DefaultValueCzk { get; set; }
 
+        /// <summary>
+        /// Gets or sets the performance of the investment in Czech Koruna (CZK).
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("performanceCzk")]
         public int PerformanceCzk { get; set; }
+
+        /// <summary>
+        /// Gets or sets the percentage performance of the investment.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("performancePercentage")]
         public float PerformancePercentage { get; set; }
@@ -876,13 +944,23 @@ namespace InvestmentPortfolio.Client.Services.Api
 
     }
 
+    /// <summary>
+    /// Represents a collection of exchange rates.
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ExchangeRates
     {
+        /// <summary>
+        /// Gets or sets the date of the exchange rates.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("date")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Date { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of exchange rates.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
         [System.ComponentModel.DataAnnotations.Required]
@@ -907,24 +985,46 @@ namespace InvestmentPortfolio.Client.Services.Api
 
     }
 
+    /// <summary>
+    /// Represents an exchange rate for a specific currency.
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class ExchangeRate
     {
+        /// <summary>
+        /// Gets or sets the country associated with the currency.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("country")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Country { get; set; }
 
+        /// <summary>
+        /// Gets or sets the currency code.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("currency")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Currency { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ISO currency code.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("code")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Code { get; set; }
 
+        /// <summary>
+        /// Gets or sets the amount of currency.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("amount")]
         public int Amount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the exchange rate.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("rate")]
         public float Rate { get; set; }
@@ -948,21 +1048,39 @@ namespace InvestmentPortfolio.Client.Services.Api
 
     }
 
+    /// <summary>
+    /// Represents data transfer object (DTO) for an investment.
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class InvestmentDto
     {
+        /// <summary>
+        /// Gets or sets the ID of the investment.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the investment.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.StringLength(40, MinimumLength = 1)]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value of the investment.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("value")]
         [System.ComponentModel.DataAnnotations.Range(1, 100000000)]
         public int Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the currency code of the investment.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("currencyCode")]
         [System.ComponentModel.DataAnnotations.Required]
@@ -988,29 +1106,55 @@ namespace InvestmentPortfolio.Client.Services.Api
 
     }
 
+    /// <summary>
+    /// Represents a data transfer object (DTO) for geolocation information.
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class GeolocationDto
     {
+        /// <summary>
+        /// The IP address.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ipAddress")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string IpAddress { get; set; }
 
+        /// <summary>
+        /// The city.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("city")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string City { get; set; }
+
+        /// <summary>
+        /// The country.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("country")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Country { get; set; }
 
+        /// <summary>
+        /// The Internet Service Provider (ISP).
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("isp")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Isp { get; set; }
 
+        /// <summary>
+        /// The local date.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("localDate")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string LocalDate { get; set; }
+
+        /// <summary>
+        /// The referer.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("referer")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]

@@ -2,6 +2,10 @@
 
 namespace InvestmentPortfolio.Middlewares;
 
+/// <summary>
+/// Middleware for capturing request information and retrieving geolocation data.
+/// </summary>
+/// <param name="geolocationService">The geolocation service.</param>
 public sealed class RequestInfoMiddleware(IGeolocationService geolocationService) : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)

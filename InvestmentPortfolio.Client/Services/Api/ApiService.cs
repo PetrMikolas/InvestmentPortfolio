@@ -2,8 +2,12 @@
 
 namespace InvestmentPortfolio.Client.Services.Api;
 
+/// <summary>
+/// Service for interacting with the API, providing methods to retrieve, save, update, and delete investment data.
+/// Implements the <see cref="IApiService"/> interface.
+/// </summary>
 public sealed class ApiService(IApiClient apiClient) : IApiService
-{
+{    
     public async Task<InvestmentsDto> GetInvestmentsAsync(bool hasRefresExchangeRates = false, CancellationToken cancellationToken = default)
     {
         try
@@ -25,7 +29,7 @@ public sealed class ApiService(IApiClient apiClient) : IApiService
             throw new Exception("Neočekávaná chyba. O problému víme a pracujeme na nápravě.");
         }
     }
-
+    
     public async Task SaveInvestmentAsync(InvestmentDto investment, CancellationToken cancellationToken = default)
     {
         try
@@ -47,7 +51,7 @@ public sealed class ApiService(IApiClient apiClient) : IApiService
             throw new Exception("Neočekávaná chyba. O problému víme a pracujeme na nápravě.");
         }
     }
-
+    
     public async Task UpdateInvestmentAsync(InvestmentDto investment, CancellationToken cancellationToken = default)
     {
         try
@@ -69,7 +73,7 @@ public sealed class ApiService(IApiClient apiClient) : IApiService
             throw new Exception("Neočekávaná chyba. O problému víme a pracujeme na nápravě.");
         }
     }
-
+    
     public async Task DeleteInvestmentAsync(int id, CancellationToken cancellationToken = default)
     {
         try

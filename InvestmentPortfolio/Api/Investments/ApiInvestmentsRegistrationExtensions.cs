@@ -8,8 +8,16 @@ using InvestmentPortfolio.Helpers;
 
 namespace InvestmentPortfolio.Api.Investments;
 
+/// <summary>
+/// Extension method for registering investment API endpoints.
+/// </summary>
 public static class ApiInvestmentsRegistrationExtensions
 {
+    /// <summary>
+    /// Maps the endpoints of the investments.
+    /// </summary>
+    /// <param name="app">The WebApplication instance.</param>
+    /// <returns>The web application with mapped endpoints for investment operations.</returns>
     public static WebApplication MapEndpointsInvestments(this WebApplication app)
     {
         app.MapGet("investments", async ([FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken, [FromQuery(Name = "RefreshExchangeRates")] bool hasRefresExchangeRates = false) =>

@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvestmentPortfolio.Database.Geolocation;
 
+/// <summary>
+/// Represents the database context for geolocation data.
+/// </summary>
 internal sealed class GeolocationDbContext : DbContext
 {
     public GeolocationDbContext(DbContextOptions<GeolocationDbContext> options) : base(options) { }
