@@ -10,14 +10,12 @@ namespace InvestmentPortfolio.Services.Geolocation;
 /// <summary>
 /// Service for retrieving geolocation data based on IP address, implementing the <see cref="IGeolocationService"/> interface.
 /// </summary>
+/// <param name="httpClient">The HTTP client used for making requests to the geolocation API.</param>
+/// <param name="geolocationRepository">The repository for managing geolocation data.</param>
+/// <param name="mapper">The mapper for mapping between geolocation models and entities.</param>
+/// <param name="email">The service for sending email notifications.</param>
 internal sealed class GeolocationService(HttpClient httpClient, IGeolocationRepository geolocationRepository, IMapper mapper, IEmailService email) : IGeolocationService
 {
-    /// <summary>
-    /// Asynchronously retrieves geolocation data based on the provided IP address.
-    /// </summary>
-    /// <param name="ipAddress">The IP address to retrieve geolocation data for.</param>
-    /// <param name="referer">The referer URL (optional). Defaults to an empty string.</param>
-    /// <param name="cancellationToken">The cancellation token (optional). Defaults to <see cref="CancellationToken.None"/>.</param>
     public async Task GetGeolocationAsync(string ipAddress, string referer = "", CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(ipAddress) || ipAddress.Contains("192.168.1."))
