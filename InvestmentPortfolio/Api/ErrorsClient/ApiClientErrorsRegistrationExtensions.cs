@@ -17,8 +17,13 @@ public static class ApiClientErrorsRegistrationExtensions
     {
         app.MapPost("errors", ([FromBody] string errorMessage, [FromServices] IEmailService email, CancellationToken cancellationToken) =>
         {
+            if (string.IsNullOrEmpty(errorMessage))
+            {
+                return Results.BadRequest("HTTP Request Body musí obsahovat chybovou zprávu.");
+            }
+
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error: {errorMessage}");            
+            Console.WriteLine($"Error: {errorMessage}");
             Console.ResetColor();
 
             _ = email.SendErrorAsync(errorMessage, cancellationToken);
@@ -28,7 +33,8 @@ public static class ApiClientErrorsRegistrationExtensions
         .WithTags("Errors")
         .WithName("SendError")
         .WithOpenApi(operation => new(operation) { Summary = "Send an error" })
-        .Produces(StatusCodes.Status204NoContent);
+        .Produces(StatusCodes.Status204NoContent)
+        .Produces(StatusCodes.Status400BadRequest);
 
         return app;
     }
