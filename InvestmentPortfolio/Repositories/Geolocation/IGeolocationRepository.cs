@@ -20,5 +20,6 @@ public interface IGeolocationRepository
     /// <param name="entity">The geolocation entity to create.</param>
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the provided geolocation entity is null.</exception>
     Task CreateAsync(GeolocationEntity entity, CancellationToken cancellationToken);
 }

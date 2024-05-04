@@ -14,7 +14,8 @@ namespace InvestmentPortfolio.Services.Geolocation;
 /// <param name="geolocationRepository">The repository for managing geolocation data.</param>
 /// <param name="mapper">The mapper for mapping between geolocation models and entities.</param>
 /// <param name="email">The service for sending email notifications.</param>
-internal sealed class GeolocationService(HttpClient httpClient, IGeolocationRepository geolocationRepository, IMapper mapper, IEmailService email) : IGeolocationService
+/// <param name="logger">The logger instance for logging errors.</param>
+internal sealed class GeolocationService(HttpClient httpClient, IGeolocationRepository geolocationRepository, IMapper mapper, IEmailService email, ILogger<GeolocationService> logger) : IGeolocationService
 {
     public async Task GetGeolocationAsync(string ipAddress, string referer = "", CancellationToken cancellationToken = default)
     {
@@ -23,27 +24,34 @@ internal sealed class GeolocationService(HttpClient httpClient, IGeolocationRepo
             return;
         }
 
-        var response = await httpClient.GetAsync($"http://ip-api.com/json/{ipAddress}", cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            return;
+            var response = await httpClient.GetAsync($"http://ip-api.com/json/{ipAddress}", cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+            var geolocation = JsonSerializer.Deserialize<GeolocationApi>(responseContent, options);
+
+            if (geolocation is null)
+            {
+                return;
+            }
+
+            var geolocationEntity = mapper.Map<GeolocationEntity>(geolocation);
+            geolocationEntity.LocalDate = DateTime.Now.ToString();
+            geolocationEntity.Referer = referer ?? string.Empty;
+
+            await email.SendObjectAsync(geolocationEntity, "Investiční portfolio - geolocation", cancellationToken);
+            await geolocationRepository.CreateAsync(geolocationEntity, cancellationToken);
         }
-
-        string responseContent = await response.Content.ReadAsStringAsync();
-        var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-        var geolocation = JsonSerializer.Deserialize<GeolocationApi>(responseContent, options);
-
-        if (geolocation is null)
-        {
-            return;
+        catch (Exception ex)
+        {            
+            logger.LogError(ex.ToString());
         }
-
-        var geolocationEntity = mapper.Map<GeolocationEntity>(geolocation);
-        geolocationEntity.LocalDate = DateTime.Now.ToString();
-        geolocationEntity.Referer = referer;
-
-        _ = email.SendObjectAsync(geolocationEntity, "Investiční portfolio - geolocation");
-        await geolocationRepository.CreateAsync(geolocationEntity, cancellationToken);
     }
 }

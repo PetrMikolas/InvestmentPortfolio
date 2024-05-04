@@ -18,6 +18,8 @@ internal sealed class GeolocationRepository(GeolocationDbContext dbContext) : IG
     
     public async Task CreateAsync(GeolocationEntity entity, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(entity);
+
         dbContext.Geolocations.Add(entity);
         await dbContext.SaveChangesAsync(cancellationToken);
     }

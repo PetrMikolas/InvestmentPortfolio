@@ -23,8 +23,8 @@ internal sealed class InvestmentRepository(InvestmentDbContext dbContext) : IInv
     }
         
     public async Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
-    {
-        _ = entity ?? throw new ArgumentNullException(nameof(entity));
+    {        
+        ArgumentNullException.ThrowIfNull(entity);
 
         dbContext.Investments.Add(entity);
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -32,7 +32,7 @@ internal sealed class InvestmentRepository(InvestmentDbContext dbContext) : IInv
         
     public async Task UpdateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
     {
-        _ = entity ?? throw new ArgumentNullException(nameof(entity));
+        ArgumentNullException.ThrowIfNull(entity);
 
         var investment = await dbContext.Investments.FindAsync(entity.Id, cancellationToken) ?? throw new EntityNotFoundException(nameof(InvestmentEntity));
         investment.Name = entity.Name;
