@@ -1,31 +1,31 @@
 ﻿@if (_data.Count == 0) return;
 
-<RadzenChart SeriesClick=@OnSeriesClick Style="min-height:400px;" class="rz-unselectable-text">
-    <RadzenPieSeries Data="@_data" CategoryProperty="NamePercentageShare" ValueProperty="ValueCzk">
-        <TooltipTemplate Context="data">
-            <span>@data.Name</span>
-        </TooltipTemplate>
-    </RadzenPieSeries>
-</RadzenChart>
+    <RadzenChart SeriesClick=@OnSeriesClick Style="min-height:400px;" class="rz-unselectable-text">
+        <RadzenPieSeries Data="@_data" CategoryProperty="NamePercentageShare" ValueProperty="ValueCzk">
+            <TooltipTemplate Context="data">
+                <span>@data.Name</span>
+            </TooltipTemplate>
+        </RadzenPieSeries>
+    </RadzenChart>
 
 @code {
     [Parameter] public List<Investment>? Investments { get; set; }
     [Parameter] public EventCallback<string> OnInvestmentSummary { get; set; }
     private List<Investment> _data = [];
 
-    void OnSeriesClick(SeriesClickEventArgs args)
+    private void OnSeriesClick(SeriesClickEventArgs args)
     {
         string summary = string.Empty;
         var investment = (Investment)args.Data;
 
         if (investment.CurrencyCode != "CZK")
         {
-            summary = $"{investment.Name} \u00BB hodnota {investment.CurrencyCode}: {investment.Value.ToString("# ### ###")} " +
-                      $"\u00BB hodnota Kč: {investment.ValueCzk.ToString("# ### ###")} \u00BB podíl: {investment.PercentageShare} %";
+            summary = $"{investment.Name} \u00BB hodnota {investment.CurrencyCode}: {investment.Value.ToString("N0")} " +
+                      $"\u00BB hodnota Kč: {investment.ValueCzk.ToString("N0")} \u00BB podíl: {investment.PercentageShare} %";
         }
         else
         {
-            summary = $"{investment.Name} \u00BB hodnota Kč: {investment.ValueCzk.ToString("# ### ###")} \u00BB podíl: {investment.PercentageShare} %";
+            summary = $"{investment.Name} \u00BB hodnota Kč: {investment.ValueCzk.ToString("N0")} \u00BB podíl: {investment.PercentageShare} %";
         }
 
         OnInvestmentSummary.InvokeAsync(summary);

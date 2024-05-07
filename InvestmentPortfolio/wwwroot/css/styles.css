@@ -72,3 +72,7 @@
         width: 100%;
         padding: 1rem;
     }
+
+.rz-legend-item {
+    cursor: default !important;
+}
