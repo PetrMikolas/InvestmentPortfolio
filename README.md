@@ -8,11 +8,13 @@ Naprogramováno v jazyce C# v prostředí Microsoft .NET 8
 - API - Minimal API
 - API dokumentace - OpenAPI
 - ApiClient - NSwag
-- Databáze - Entity Framework Core code-first
-- Sledování chyb - Sentry
+- Databáze - Microsoft SQL Server (MS SQL)
+- ORM - Entity Framework Core (code-first)
 - Unit testy - NUnit
 - Integrační testy - NUnit
-- Automatizované testy jsou spouštěny pomocí příslušných příkazů v Dockerfile během sestavování obrazu Docker kontejneru
+- Automatizované testy jsou spouštěny pomocí příslušných příkazů v Dockerfile během sestavování Docker kontejneru
+- Nasazení - Docker kontejner pomocí Docker Compose
+- Sledování chyb - Sentry
 
 ![Screenshot](Screenshots/InvestmentPortfolio_1.png)
 ![Screenshot](Screenshots/InvestmentPortfolio_2.png)
