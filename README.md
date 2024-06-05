@@ -4,7 +4,7 @@ Webová aplikace pro evidenci investic, stahování aktuálních devizových kur
 
 Naprogramováno v jazyce C# v prostředí Microsoft .NET 8 
 
-- App/Client - Blazor Web App 
+- App/Client - ASP.NET Core (Blazor Web App) 
 - API - Minimal API
 - API dokumentace - OpenAPI
 - ApiClient - NSwag
