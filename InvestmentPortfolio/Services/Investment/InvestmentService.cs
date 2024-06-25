@@ -17,6 +17,7 @@ namespace InvestmentPortfolio.Services.Investment;
 internal sealed class InvestmentService(IInvestmentRepository repository, IExchangeRateService exchangeRateService, IMapper mapper, IMemoryCache memoryCache) : IInvestmentService
 {
     private const string INVESTMENTS_CACHE_KEY = "Investments";
+    private const string EXCHANGE_RATES_CACHE_KEY = "ExchangeRates";
 
     public async Task<Investments> GetAllAsync(bool hasRefreshExchangeRates, CancellationToken cancellationToken)
     {
@@ -150,18 +151,16 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns the exchange rates.</returns>
     private async Task<ExchangeRates> GetExchangeRatesAsync(bool isRefresh, CancellationToken cancellationToken)
-    {
-        string key = "ExchangeRates";
-
+    {        
         if (isRefresh)
         {
-            memoryCache.Remove(key);
+            RemoveCache(EXCHANGE_RATES_CACHE_KEY);
         }
 
-        return await memoryCache.GetOrCreateAsync(key, async entry =>
+        return await memoryCache.GetOrCreateAsync(EXCHANGE_RATES_CACHE_KEY, async entry =>
         {
             entry.SetAbsoluteExpiration(DateTime.Now.AddDays(1));
-            memoryCache.Remove(INVESTMENTS_CACHE_KEY);
+            RemoveCache(INVESTMENTS_CACHE_KEY);
             return await exchangeRateService.GetExchangeRatesAsync(cancellationToken);
 
         }) ?? new ExchangeRates();
@@ -170,7 +169,7 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
         await repository.DeleteAsync(id, cancellationToken);
-        memoryCache.Remove(INVESTMENTS_CACHE_KEY);
+        RemoveCache(INVESTMENTS_CACHE_KEY);
     }
 
     public async Task CreateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
@@ -184,7 +183,7 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
         }
 
         await repository.CreateAsync(entity, cancellationToken);
-        memoryCache.Remove(INVESTMENTS_CACHE_KEY);
+        RemoveCache(INVESTMENTS_CACHE_KEY);
     }
 
     public async Task UpdateAsync(InvestmentEntity? entity, CancellationToken cancellationToken)
@@ -206,6 +205,11 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
         currentInvestment.CurrencyCode = entity.CurrencyCode;
 
         await repository.UpdateAsync(currentInvestment, cancellationToken);
-        memoryCache.Remove(INVESTMENTS_CACHE_KEY);
+        RemoveCache(INVESTMENTS_CACHE_KEY);
+    }
+
+    private void RemoveCache(string cacheKey)
+    {
+        memoryCache.Remove(cacheKey);
     }
 }
