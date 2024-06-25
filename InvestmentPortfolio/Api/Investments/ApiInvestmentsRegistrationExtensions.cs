@@ -1,10 +1,10 @@
 ﻿using InvestmentPortfolio.Models;
 using InvestmentPortfolio.Exceptions;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using InvestmentPortfolio.Services.Investment;
-using InvestmentPortfolio.Repositories.Entities;
 using InvestmentPortfolio.Helpers;
+using MediatR;
+using InvestmentPortfolio.Queries.Investment;
+using InvestmentPortfolio.Commands.Investment;
 
 namespace InvestmentPortfolio.Api.Investments;
 
@@ -20,35 +20,36 @@ public static class ApiInvestmentsRegistrationExtensions
     /// <returns>The web application with mapped endpoints for investment operations.</returns>
     public static WebApplication MapEndpointsInvestments(this WebApplication app)
     {
-        app.MapGet("investments", async ([FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken, [FromQuery(Name = "RefreshExchangeRates")] bool hasRefresExchangeRates = false) =>
+        app.MapGet("investments", async ([FromQuery(Name = "RefreshExchangeRates")] bool hasRefreshExchangeRates, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
         {
-            var result = await investmentsService.GetAllAsync(hasRefresExchangeRates, cancellationToken);
-            return Results.Ok(mapper.Map<InvestmentsDto>(result));
+            var query = new GetInvestmentsQuery(hasRefreshExchangeRates);
+            var investments = await mediator.Send(query, cancellationToken);
+            return Results.Ok(investments);
         })
         .WithTags("Investments")
         .WithName("GetInvestments")
         .WithOpenApi(operation => new(operation) { Summary = "Get all investments" })
         .Produces<InvestmentsDto>(StatusCodes.Status200OK);
 
-        app.MapPost("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken) =>
+        app.MapPost("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (!Helper.IsValidInvestmentDto(investmentDto, HttpMethod.Post, out string error))
             {
                 return Results.BadRequest(error);
             }
-            
-            var entity = mapper.Map<InvestmentEntity>(investmentDto);
-            await investmentsService.CreateAsync(entity, cancellationToken);
-            return Results.Created($"investments/{entity?.Id}", investmentDto);
+
+            var command = new CreateInvestmentCommand(investmentDto);
+            var cretedInvestmentId = await mediator.Send(command, cancellationToken);
+            return Results.Created($"investments/{cretedInvestmentId}", null);
         })
         .WithTags("Investments")
         .WithName("CreateInvestment")
         .WithOpenApi(operation => new(operation) { Summary = "Create an investment" })
-        .Produces<InvestmentsDto>(StatusCodes.Status201Created)
+        .Produces(StatusCodes.Status201Created)
         .Produces(StatusCodes.Status400BadRequest);
 
-        app.MapPut("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IInvestmentService investmentsService, [FromServices] IMapper mapper, CancellationToken cancellationToken) =>
-        {            
+        app.MapPut("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+        {
             if (!Helper.IsValidInvestmentDto(investmentDto, HttpMethod.Put, out string error))
             {
                 return Results.BadRequest(error);
@@ -56,8 +57,8 @@ public static class ApiInvestmentsRegistrationExtensions
 
             try
             {
-                var entita = mapper.Map<InvestmentEntity>(investmentDto);
-                await investmentsService.UpdateAsync(entita, cancellationToken);
+                var command = new UpdateInvestmentCommand(investmentDto);
+                await mediator.Send(command, cancellationToken);
                 return Results.NoContent();
             }
             catch (EntityNotFoundException ex)
@@ -72,7 +73,7 @@ public static class ApiInvestmentsRegistrationExtensions
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound);
 
-        app.MapDelete("investments/{id}", async ([FromRoute] int id, [FromServices] IInvestmentService investmentsService, CancellationToken cancellationToken) =>
+        app.MapDelete("investments/{id}", async ([FromRoute] int id, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
         {
             if (id <= 0)
             {
@@ -81,7 +82,8 @@ public static class ApiInvestmentsRegistrationExtensions
 
             try
             {
-                await investmentsService.DeleteAsync(id, cancellationToken);
+                var command = new DeleteInvestmentCommand(id);
+                await mediator.Send(command, cancellationToken);
                 return Results.NoContent();
             }
             catch (EntityNotFoundException ex)

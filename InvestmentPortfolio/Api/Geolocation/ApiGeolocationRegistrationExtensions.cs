@@ -1,6 +1,6 @@
-﻿using AutoMapper;
-using InvestmentPortfolio.Models;
-using InvestmentPortfolio.Repositories.Geolocation;
+﻿using InvestmentPortfolio.Models;
+using InvestmentPortfolio.Queries.Geolocation;
+using MediatR;
 
 namespace InvestmentPortfolio.Api.Geolocation;
 
@@ -16,15 +16,16 @@ public static class ApiGeolocationRegistrationExtensions
     /// <returns>The web application with mapped endpoints for geolocation operations.</returns>
     public static WebApplication MapEndpointsGeolocations(this WebApplication app)
     {
-        app.MapGet("geolocations", async (IGeolocationRepository repository, IMapper mapper, CancellationToken cancellationToken) =>
+        app.MapGet("geolocations", async (IMediator mediator, CancellationToken cancellationToken) =>
         {
-            var result = await repository.GetAllAsync(cancellationToken);
-            return Results.Ok(result.Select(geolocation => mapper.Map<GeolocationDto>(geolocation)));
+            var query = new GetGeolocationsQuery();
+            var geolocations = await mediator.Send(query, cancellationToken);
+            return Results.Ok(geolocations);
         })
         .WithTags("Geolocations")
         .WithName("GetGeolocations")
         .WithOpenApi(operation => new(operation) { Summary = "Get all geolocations" })
-        .Produces<List<GeolocationDto>>(StatusCodes.Status200OK);
+        .Produces<IEnumerable<GeolocationDto>>(StatusCodes.Status200OK);
 
         return app;
     }

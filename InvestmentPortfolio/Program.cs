@@ -25,6 +25,8 @@ builder.WebHost.UseSentry(o =>
     o.TracesSampleRate = 1.0;
 });
 
+builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 builder.Services.AddScoped<RequestInfoMiddleware>();
 builder.Services.AddMemoryCache();
 

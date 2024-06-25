@@ -58,7 +58,7 @@ internal class InvestmentTests
             .Start();              
 
         // Act
-        var response = await _httpClient.GetAsync($"investments");
+        var response = await _httpClient.GetAsync($"investments?RefreshExchangeRates=false");
 
         // Assert
         response.Should().NotBeNull();
@@ -158,19 +158,6 @@ internal class InvestmentTests
 
         // Assert
         response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        responseContent.Should().NotBeNull();
-
-        var responseData = JsonSerializer.Deserialize<Investment>(responseContent, Constants.DefaultJsonSerializerOptions);
-        responseData.Should().NotBeNull();
-
-        if (responseData is not null)
-        {
-            responseData.Name.Should().Be(investment.Name);
-            responseData.Value.Should().Be(investment.Value);
-            responseData.CurrencyCode.Should().Be(investment.CurrencyCode);
-        }
+        response.StatusCode.Should().Be(HttpStatusCode.Created);    
     }
 }
