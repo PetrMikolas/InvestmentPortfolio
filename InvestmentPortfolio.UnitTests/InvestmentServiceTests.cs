@@ -55,14 +55,14 @@ internal class InvestmentServiceTests
         };
 
         _mockInvestmentRepository.Setup(x => x.GetAllAsync(default)).ReturnsAsync(entities);
-        _mockExchangeRateService.Setup(x => x.GetExchangeRatesAsync(default)).ReturnsAsync(exchangeRates);
+        _mockExchangeRateService.Setup(x => x.GetAsync(default)).ReturnsAsync(exchangeRates);
 
         // Act
         var response = await _investmentService.GetAllAsync(false, default);
 
         // Assert
         _mockInvestmentRepository.Verify(x => x.GetAllAsync(default), Times.Once());
-        _mockExchangeRateService.Verify(x => x.GetExchangeRatesAsync(default), Times.Once());
+        _mockExchangeRateService.Verify(x => x.GetAsync(default), Times.Once());
 
         response.Should().NotBeNull();
         response.Items.Should().NotBeNullOrEmpty().And.HaveCount(3);
@@ -89,14 +89,14 @@ internal class InvestmentServiceTests
         var exchangeRatesEmpty = new ExchangeRates();
 
         _mockInvestmentRepository.Setup(x => x.GetAllAsync(default)).ReturnsAsync(entities);
-        _mockExchangeRateService.Setup(x => x.GetExchangeRatesAsync(default)).ReturnsAsync(exchangeRatesEmpty);
+        _mockExchangeRateService.Setup(x => x.GetAsync(default)).ReturnsAsync(exchangeRatesEmpty);
 
         // Act
         var response = await _investmentService.GetAllAsync(false, default);
 
         // Assert
         _mockInvestmentRepository.Verify(x => x.GetAllAsync(default), Times.Once());
-        _mockExchangeRateService.Verify(x => x.GetExchangeRatesAsync(default), Times.Once());
+        _mockExchangeRateService.Verify(x => x.GetAsync(default), Times.Once());
 
         response.Should().NotBeNull();
         response.Items.Should().NotBeNullOrEmpty().And.HaveCount(3);
@@ -126,14 +126,14 @@ internal class InvestmentServiceTests
         };
 
         _mockInvestmentRepository.Setup(x => x.GetAllAsync(default)).ReturnsAsync(entitiesEmpty);
-        _mockExchangeRateService.Setup(x => x.GetExchangeRatesAsync(default)).ReturnsAsync(exchangeRates);
+        _mockExchangeRateService.Setup(x => x.GetAsync(default)).ReturnsAsync(exchangeRates);
 
         // Act
         var response = await _investmentService.GetAllAsync(false, default);
 
         // Assert
         _mockInvestmentRepository.Verify(x => x.GetAllAsync(default), Times.Once());
-        _mockExchangeRateService.Verify(x => x.GetExchangeRatesAsync(default), Times.Once());
+        _mockExchangeRateService.Verify(x => x.GetAsync(default), Times.Once());
 
         response.Should().NotBeNull();
         response.Items.Should().NotBeNull().And.HaveCount(0);
@@ -152,14 +152,14 @@ internal class InvestmentServiceTests
         var exchangeRatesEmpty = new ExchangeRates();
 
         _mockInvestmentRepository.Setup(x => x.GetAllAsync(default)).ReturnsAsync(entitiesEmpty);
-        _mockExchangeRateService.Setup(x => x.GetExchangeRatesAsync(default)).ReturnsAsync(exchangeRatesEmpty);
+        _mockExchangeRateService.Setup(x => x.GetAsync(default)).ReturnsAsync(exchangeRatesEmpty);
 
         // Act
         var response = await _investmentService.GetAllAsync(false, default);
 
         // Assert
         _mockInvestmentRepository.Verify(x => x.GetAllAsync(default), Times.Once());
-        _mockExchangeRateService.Verify(x => x.GetExchangeRatesAsync(default), Times.Once());
+        _mockExchangeRateService.Verify(x => x.GetAsync(default), Times.Once());
 
         response.Should().NotBeNull();
         response.Items.Should().NotBeNull().And.HaveCount(0);

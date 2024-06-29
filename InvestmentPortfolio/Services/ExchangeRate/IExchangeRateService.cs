@@ -12,5 +12,5 @@ public interface IExchangeRateService
     /// </summary>
     /// <param name="cancellationToken">The cancellation token (optional). Defaults to <see cref="CancellationToken.None"/>.</param>
     /// <returns>Returns exchange rates.</returns>
-    Task<ExchangeRates> GetExchangeRatesAsync(CancellationToken cancellationToken = default);
+    Task<ExchangeRates> GetAsync(CancellationToken cancellationToken = default);
 }

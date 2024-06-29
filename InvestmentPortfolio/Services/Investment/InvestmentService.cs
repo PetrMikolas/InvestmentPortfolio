@@ -13,32 +13,33 @@ namespace InvestmentPortfolio.Services.Investment;
 /// <param name="repository">The repository for managing investments.</param>
 /// <param name="exchangeRateService">The service for exchange rates.</param>
 /// <param name="mapper">The AutoMapper instance for mapping entities to models.</param>
-/// <param name="memoryCache">The memory cache for caching investments and exchange rates.</param>
-internal sealed class InvestmentService(IInvestmentRepository repository, IExchangeRateService exchangeRateService, IMapper mapper, IMemoryCache memoryCache) : IInvestmentService
+/// <param name="cache">The memory cache for caching investments and exchange rates.</param>
+internal sealed class InvestmentService(IInvestmentRepository repository, IExchangeRateService exchangeRateService, IMapper mapper, IMemoryCache cache) : IInvestmentService
 {
     private const string INVESTMENTS_CACHE_KEY = "Investments";
     private const string EXCHANGE_RATES_CACHE_KEY = "ExchangeRates";
+    private const string CURRENCY_CODE_CZK = "CZK";
 
     public async Task<Investments> GetAllAsync(bool hasRefreshExchangeRates, CancellationToken cancellationToken)
     {
         var exchangeRates = await GetExchangeRatesAsync(hasRefreshExchangeRates, cancellationToken);
 
-        return await memoryCache.GetOrCreateAsync(INVESTMENTS_CACHE_KEY, async entry =>
+        return await cache.GetOrCreateAsync(INVESTMENTS_CACHE_KEY, async entry =>
         {
             var entities = await repository.GetAllAsync(cancellationToken);
-            List<Models.Investment> items = [.. entities.Select(mapper.Map<Models.Investment>)];
+            var investmentItems = entities.Select(entity => mapper.Map<Models.Investment>(entity)).ToList();
 
-            SetValueCzk(items, exchangeRates.Items);
-            var totalSumCzk = items.Sum(x => x.ValueCzk);
-            SetPercentageShare(items, totalSumCzk);
-            SetPerformanceValues(items);
+            SetValueCzk(investmentItems, exchangeRates.Items);
+            var totalSumCzk = investmentItems.Sum(x => x.ValueCzk);
+            SetPercentageShare(investmentItems, totalSumCzk);
+            SetPerformanceValues(investmentItems);
 
             return new Investments()
             {
                 TotalSumCzk = totalSumCzk,
-                TotalPerformanceCzk = items.Where(x => x.CurrencyCode != "CZK").Sum(x => x.PerformanceCzk),
-                TotalPerformancePercentage = CalculateTotalPerformancePercentage(items),
-                Items = items,
+                TotalPerformanceCzk = investmentItems.Where(x => x.CurrencyCode != CURRENCY_CODE_CZK).Sum(x => x.PerformanceCzk),
+                TotalPerformancePercentage = CalculateTotalPerformancePercentage(investmentItems),
+                Items = investmentItems,
                 ExchangeRates = exchangeRates
             };
 
@@ -52,7 +53,7 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
     /// <returns>Returns the total performance percentage.</returns>
     private float CalculateTotalPerformancePercentage(List<Models.Investment> investments)
     {
-        var data = investments.Where(x => x.CurrencyCode != "CZK");
+        var data = investments.Where(x => x.CurrencyCode != CURRENCY_CODE_CZK);
 
         if (!data.Any())
         {
@@ -79,7 +80,7 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
     {
         foreach (var investment in investments)
         {
-            if (investment.CurrencyCode != "CZK" && investment.ValueCzk != investment.DefaultValueCzk)
+            if (investment.CurrencyCode != CURRENCY_CODE_CZK && investment.ValueCzk != investment.DefaultValueCzk)
             {
                 investment.PerformanceCzk = (int)(investment.ValueCzk - investment.DefaultValueCzk);
                 investment.PerformancePercentage = (float)Math.Round(investment.PerformanceCzk / (decimal)investment.DefaultValueCzk * 100, 2);
@@ -104,7 +105,7 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
     /// <returns>Returns the value of the investment in CZK.</returns>
     private long CalculateValueCzk(long value, string currencyCode, List<Models.ExchangeRate> exchangeRates)
     {
-        if (currencyCode == "CZK")
+        if (currencyCode == CURRENCY_CODE_CZK)
         {
             return value;
         }
@@ -157,11 +158,11 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
             RemoveCache(EXCHANGE_RATES_CACHE_KEY);
         }
 
-        return await memoryCache.GetOrCreateAsync(EXCHANGE_RATES_CACHE_KEY, async entry =>
+        return await cache.GetOrCreateAsync(EXCHANGE_RATES_CACHE_KEY, async entry =>
         {
             entry.SetAbsoluteExpiration(DateTime.Now.AddDays(1));
             RemoveCache(INVESTMENTS_CACHE_KEY);
-            return await exchangeRateService.GetExchangeRatesAsync(cancellationToken);
+            return await exchangeRateService.GetAsync(cancellationToken);
 
         }) ?? new ExchangeRates();
     }
@@ -176,7 +177,7 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        if (entity.CurrencyCode != "CZK")
+        if (entity.CurrencyCode != CURRENCY_CODE_CZK)
         {
             var exchangeRates = await GetExchangeRatesAsync(true, cancellationToken);
             entity.DefaultValueCzk = CalculateValueCzk(entity.Value, entity.CurrencyCode, exchangeRates.Items);
@@ -192,7 +193,7 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
 
         var currentInvestment = await repository.GetByIdAsync(entity.Id, cancellationToken);
 
-        if (entity.CurrencyCode != "CZK" && entity.Value != currentInvestment.Value || entity.CurrencyCode != currentInvestment.CurrencyCode)
+        if (entity.CurrencyCode != CURRENCY_CODE_CZK && entity.Value != currentInvestment.Value || entity.CurrencyCode != currentInvestment.CurrencyCode)
         {
             var exchangeRates = await GetExchangeRatesAsync(true, cancellationToken);
 
@@ -210,6 +211,6 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
 
     private void RemoveCache(string cacheKey)
     {
-        memoryCache.Remove(cacheKey);
+        cache.Remove(cacheKey);
     }
 }

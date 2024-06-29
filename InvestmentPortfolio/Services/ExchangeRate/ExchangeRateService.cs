@@ -12,7 +12,7 @@ namespace InvestmentPortfolio.Services.ExchangeRate;
 /// <param name="logger">The logger instance for logging.</param>
 internal sealed class ExchangeRateService(HttpClient httpClient, IConfiguration configuration, IEmailService email, ILogger<ExchangeRateService> logger) : IExchangeRateService
 {
-    public async Task<ExchangeRates> GetExchangeRatesAsync(CancellationToken cancellationToken)
+    public async Task<ExchangeRates> GetAsync(CancellationToken cancellationToken)
     {
         var url = configuration["UrlApiCnb"];
         var exchangeRates = new ExchangeRates();
@@ -20,7 +20,7 @@ internal sealed class ExchangeRateService(HttpClient httpClient, IConfiguration 
         if (string.IsNullOrEmpty(url))
         {
             logger.LogError("Nelze načíst URL API ČNB");
-            _ = email.SendErrorAsync("Nelze načíst URL API ČNB", typeof(ExchangeRateService), nameof(GetExchangeRatesAsync), cancellationToken);
+            _ = email.SendErrorAsync("Nelze načíst URL API ČNB", typeof(ExchangeRateService), nameof(GetAsync), cancellationToken);
             return exchangeRates;
         }
 
@@ -32,7 +32,7 @@ internal sealed class ExchangeRateService(HttpClient httpClient, IConfiguration 
         catch (Exception ex)
         {
             logger.LogError(ex, "Nepodařilo se připojit k API ČNB");
-            _ = email.SendErrorAsync(ex.ToString(), typeof(ExchangeRateService), nameof(GetExchangeRatesAsync), cancellationToken);
+            _ = email.SendErrorAsync(ex.ToString(), typeof(ExchangeRateService), nameof(GetAsync), cancellationToken);
         }
 
         return exchangeRates;

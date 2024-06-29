@@ -80,7 +80,7 @@ internal sealed class EmailService : IEmailService
         if (typeClass is not null && !string.IsNullOrEmpty(nameMethod))
             message = $"{message}\n   at {typeClass}.{nameMethod}()";
 
-        await SendEmailAsync(message, $"{_options.FromName} - error", _options.AdminEmailAddress, cancellationToken: cancellationToken);
+        await SendAsync(message, $"{_options.FromName} - error", _options.AdminEmailAddress, cancellationToken: cancellationToken);
     }
 
     public async Task SendObjectAsync<TValue>(TValue value, string subject, CancellationToken cancellationToken = default) where TValue : class
@@ -89,10 +89,10 @@ internal sealed class EmailService : IEmailService
 
         var options = new JsonSerializerOptions { WriteIndented = true };
         var jsonValue = JsonSerializer.Serialize(value, options);
-        await SendEmailAsync(jsonValue, subject, _options.AdminEmailAddress, cancellationToken: cancellationToken);
+        await SendAsync(jsonValue, subject, _options.AdminEmailAddress, cancellationToken: cancellationToken);
     }
 
-    public async Task SendEmailAsync(string message, string subject, string address, string name = "", TextFormat textFormat = TextFormat.Plain, CancellationToken cancellationToken = default)
+    public async Task SendAsync(string message, string subject, string address, string name = "", TextFormat textFormat = TextFormat.Plain, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrEmpty(address, nameof(address));
 
