@@ -24,7 +24,7 @@ internal class InvestmentRepositoryTests
 
         // Assert
         result.Should().NotBeNullOrEmpty();
-        result.Count.Should().BeGreaterThanOrEqualTo(3);
+        result.Count().Should().BeGreaterThanOrEqualTo(3);
     }
 
     [Test]

@@ -11,8 +11,8 @@ public interface IGeolocationRepository
     /// Retrieves all geolocation entities asynchronously.
     /// </summary>
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of geolocation entities.</returns>
-    Task<List<GeolocationEntity>> GetAllAsync(CancellationToken cancellationToken);
+    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of geolocation entities.</returns>
+    Task<IEnumerable<GeolocationEntity>> GetAllAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Creates a new geolocation entity asynchronously.

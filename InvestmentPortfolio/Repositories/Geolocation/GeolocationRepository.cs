@@ -11,9 +11,12 @@ namespace InvestmentPortfolio.Repositories.Geolocation;
 /// <param name="dbContext">The database context for geolocation entities.</param>
 internal sealed class GeolocationRepository(GeolocationDbContext dbContext) : IGeolocationRepository
 {    
-    public async Task<List<GeolocationEntity>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<GeolocationEntity>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await dbContext.Geolocations.AsNoTracking().OrderByDescending(e => e.Id).ToListAsync(cancellationToken);
+        return await dbContext.Geolocations
+            .AsNoTracking()
+            .OrderByDescending(e => e.Id)
+            .ToListAsync(cancellationToken);
     }
     
     public async Task CreateAsync(GeolocationEntity entity, CancellationToken cancellationToken)

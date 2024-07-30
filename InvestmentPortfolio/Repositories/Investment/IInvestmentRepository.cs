@@ -12,8 +12,8 @@ public interface IInvestmentRepository
     /// Retrieves all investment entities asynchronously.
     /// </summary>
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of investment entities.</returns>
-    Task<List<InvestmentEntity>> GetAllAsync(CancellationToken cancellationToken);
+    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of investment entities.</returns>
+    Task<IEnumerable<InvestmentEntity>> GetAllAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Retrieves an investment entity by its identifier asynchronously.

@@ -53,9 +53,9 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
     /// <returns>Returns the total performance percentage.</returns>
     private float CalculateTotalPerformancePercentage(List<Models.Investment> investments)
     {
-        var data = investments.Where(x => x.CurrencyCode != CURRENCY_CODE_CZK);
+        var foreignCurrencyInvestments = investments.Where(x => x.CurrencyCode != CURRENCY_CODE_CZK);
 
-        if (!data.Any())
+        if (!foreignCurrencyInvestments.Any())
         {
             return 0;
         }
@@ -63,11 +63,16 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
         long totalDefaultValueCzk = 0;
         long totalValueCzk = 0;
 
-        data.ToList().ForEach(investment =>
+        foreach (var investment in foreignCurrencyInvestments)
         {
             totalDefaultValueCzk += investment.DefaultValueCzk;
             totalValueCzk += investment.ValueCzk;
-        });
+        }
+
+        if (totalDefaultValueCzk == 0)
+        {
+            return 0; // Prevent division by zero
+        }
 
         return (float)Math.Round(totalValueCzk / (decimal)totalDefaultValueCzk * 100 - 100, 2);
     }
