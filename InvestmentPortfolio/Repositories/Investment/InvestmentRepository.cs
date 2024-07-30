@@ -38,9 +38,7 @@ internal sealed class InvestmentRepository(InvestmentDbContext dbContext) : IInv
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        var investment = await dbContext.Investments
-            .FindAsync(entity.Id, cancellationToken) 
-            ?? throw new EntityNotFoundException(nameof(InvestmentEntity));
+        var investment = await GetByIdAsync(entity.Id, cancellationToken);
 
         investment.Name = entity.Name;
         investment.Value = entity.Value;
@@ -50,9 +48,7 @@ internal sealed class InvestmentRepository(InvestmentDbContext dbContext) : IInv
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        var investment = await dbContext.Investments
-            .FindAsync(id, cancellationToken) 
-            ?? throw new EntityNotFoundException(nameof(InvestmentEntity));
+        var investment = await GetByIdAsync(id, cancellationToken);
 
         dbContext.Investments.Remove(investment);
         await dbContext.SaveChangesAsync(cancellationToken);
