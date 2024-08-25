@@ -13,9 +13,12 @@ public static class ApiClientErrorsRegistrationExtensions
     /// </summary>
     /// <param name="app">The web application.</param>
     /// <returns>The web application with mapped endpoint for reporting errors.</returns>
-    public static WebApplication MapEndpointsClientErrors(this WebApplication app)
+    public static WebApplication MapClientErrorEndpoints(this WebApplication app)
     {
-        app.MapPost("errors", ([FromBody] string errorMessage, [FromServices] IEmailService email, CancellationToken cancellationToken) =>
+        app.MapPost("errors", (
+            [FromBody] string errorMessage, 
+            [FromServices] IEmailService email, 
+            CancellationToken cancellationToken) =>
         {
             if (string.IsNullOrEmpty(errorMessage))
             {

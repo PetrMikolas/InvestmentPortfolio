@@ -1,6 +1,7 @@
 ﻿using InvestmentPortfolio.Models;
 using InvestmentPortfolio.Queries.Geolocation;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InvestmentPortfolio.Api.Geolocation;
 
@@ -14,9 +15,11 @@ public static class ApiGeolocationRegistrationExtensions
     /// </summary>
     /// <param name="app">The WebApplication instance.</param>
     /// <returns>The web application with mapped endpoints for geolocation operations.</returns>
-    public static WebApplication MapEndpointsGeolocations(this WebApplication app)
+    public static WebApplication MapGeolocationEndpoints(this WebApplication app)
     {
-        app.MapGet("geolocations", async (IMediator mediator, CancellationToken cancellationToken) =>
+        app.MapGet("geolocations", async (
+            [FromServices] IMediator mediator, 
+            CancellationToken cancellationToken) =>
         {
             var query = new GetGeolocationsQuery();
             var geolocations = await mediator.Send(query, cancellationToken);

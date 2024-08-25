@@ -1,7 +1,6 @@
 ﻿using InvestmentPortfolio.Models;
 using InvestmentPortfolio.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using InvestmentPortfolio.Helpers;
 using MediatR;
 using InvestmentPortfolio.Queries.Investment;
 using InvestmentPortfolio.Commands.Investment;
@@ -18,9 +17,12 @@ public static class ApiInvestmentsRegistrationExtensions
     /// </summary>
     /// <param name="app">The WebApplication instance.</param>
     /// <returns>The web application with mapped endpoints for investment operations.</returns>
-    public static WebApplication MapEndpointsInvestments(this WebApplication app)
+    public static WebApplication MapInvestmentEndpoints(this WebApplication app)
     {
-        app.MapGet("investments", async ([FromQuery(Name = "RefreshExchangeRates")] bool hasRefreshExchangeRates, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+        app.MapGet("investments", async (
+            [FromQuery(Name = "RefreshExchangeRates")] bool hasRefreshExchangeRates, 
+            [FromServices] IMediator mediator, 
+            CancellationToken cancellationToken) =>
         {
             var query = new GetInvestmentsQuery(hasRefreshExchangeRates);
             var investments = await mediator.Send(query, cancellationToken);
@@ -31,9 +33,12 @@ public static class ApiInvestmentsRegistrationExtensions
         .WithOpenApi(operation => new(operation) { Summary = "Get all investments" })
         .Produces<InvestmentsDto>(StatusCodes.Status200OK);
 
-        app.MapPost("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+        app.MapPost("investments", async (
+            [FromBody] InvestmentDto investmentDto, 
+            [FromServices] IMediator mediator, 
+            CancellationToken cancellationToken) =>
         {
-            if (!Helper.IsValidInvestmentDto(investmentDto, HttpMethod.Post, out string error))
+            if (!IsValidInvestmentDto(investmentDto, HttpMethod.Post, out string error))
             {
                 return Results.BadRequest(error);
             }
@@ -48,9 +53,12 @@ public static class ApiInvestmentsRegistrationExtensions
         .Produces(StatusCodes.Status201Created)
         .Produces(StatusCodes.Status400BadRequest);
 
-        app.MapPut("investments", async ([FromBody] InvestmentDto investmentDto, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+        app.MapPut("investments", async (
+            [FromBody] InvestmentDto investmentDto, 
+            [FromServices] IMediator mediator, 
+            CancellationToken cancellationToken) =>
         {
-            if (!Helper.IsValidInvestmentDto(investmentDto, HttpMethod.Put, out string error))
+            if (!IsValidInvestmentDto(investmentDto, HttpMethod.Put, out string error))
             {
                 return Results.BadRequest(error);
             }
@@ -73,7 +81,10 @@ public static class ApiInvestmentsRegistrationExtensions
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound);
 
-        app.MapDelete("investments/{id}", async ([FromRoute] int id, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+        app.MapDelete("investments/{id}", async (
+            [FromRoute] int id, 
+            [FromServices] IMediator mediator, 
+            CancellationToken cancellationToken) =>
         {
             if (id <= 0)
             {
@@ -99,5 +110,58 @@ public static class ApiInvestmentsRegistrationExtensions
         .Produces(StatusCodes.Status404NotFound);
 
         return app;
+    }
+
+    /// <summary>
+    /// Validates the provided investment data transfer object (DTO) based on the HTTP method.
+    /// </summary>
+    /// <param name="investmentDto">The investment data transfer object to validate.</param>
+    /// <param name="httpMethod">The HTTP method used for the request.</param>
+    /// <param name="error">The error message if validation fails.</param>
+    /// <returns>True if the investment DTO is valid; otherwise, false.</returns>
+    private static bool IsValidInvestmentDto(InvestmentDto? investmentDto, HttpMethod httpMethod, out string error)
+    {
+        error = string.Empty;
+
+        if (investmentDto is null)
+        {
+            error = $"Parametr <{nameof(investmentDto)}> nemůže být null.";
+            return false;
+        }
+
+        if (httpMethod == HttpMethod.Post && investmentDto.Id != 0)
+        {
+            error = $"Parametr <{nameof(investmentDto.Id)}> musí mít hodnotu 0. ";
+        }
+
+        if (httpMethod != HttpMethod.Post && investmentDto.Id <= 0)
+        {
+            error = $"Parametr <{nameof(investmentDto.Id)}> musí mít hodnotu větší než 0. ";
+        }
+
+        if (investmentDto.Name is null)
+        {
+            error += $"Parametr <{nameof(investmentDto.Name)}> nemůže být null. ";
+        }
+        else if (investmentDto.Name.Length <= 0 || investmentDto.Name.Length > 40)
+        {
+            error += $"Parametr <{nameof(investmentDto.Name)}> musí mít délku 1 až 40 znaků. ";
+        }
+
+        if (investmentDto.CurrencyCode is null)
+        {
+            error += $"Parametr <{nameof(investmentDto.CurrencyCode)}> nemůže být null. ";
+        }
+        else if (investmentDto.CurrencyCode.Length != 3)
+        {
+            error += $"Parametr <{nameof(investmentDto.CurrencyCode)}> musí mít délku 3 znaky. ";
+        }
+
+        if (investmentDto.Value <= 0 || investmentDto.Value > 100000000)
+        {
+            error += $"Parametr <{nameof(investmentDto.Value)}> musí mít hodnotu v rozsahu 1 až 100 000 000.";
+        }
+
+        return error == string.Empty;
     }
 }

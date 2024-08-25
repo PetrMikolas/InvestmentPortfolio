@@ -18,49 +18,57 @@ using static InvestmentPortfolio.Services.Email.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseSentry(o =>
+// Configure Sentry for error tracking.
+builder.WebHost.UseSentry(options =>
 {
-    o.Dsn = builder.Configuration["SentryDsn"]!;
-    o.Debug = false;
-    o.TracesSampleRate = 1.0;
+    options.Dsn = builder.Configuration["SentryDsn"]!;
+    options.Debug = false;
+    options.TracesSampleRate = 1.0;
 });
-
-builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(Program).Assembly));
-
-builder.Services.AddScoped<RequestInfoMiddleware>();
-builder.Services.AddMemoryCache();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddScoped<RequestInfoMiddleware>();
+builder.Services.AddMemoryCache();
+
+// Register and configure AutoMapper with custom profile.
+builder.Services.AddAutoMapper(config =>
+    config.AddProfile<AutoMapperProfile>(), typeof(Program).Assembly);
+
+// Register MediatR services for handling commands and queries.
+builder.Services.AddMediatR(config =>
+    config.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// Configure options for email service.
 builder.Services
     .AddOptions<EmailOptions>()
     .Bind(builder.Configuration.GetSection(EmailOptions.Key))
     .ValidateDataAnnotations();
 
+// Create and configure email service instance.
 var loggerEmailService = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<EmailService>();
 var optionsEmailService = Options.Create(new EmailOptions());
 var emailService = new EmailService(optionsEmailService, loggerEmailService);
 
-// Database
-builder.Services.AddDatabaseInvestment(builder.Configuration, emailService);
-builder.Services.AddDatabaseGeolocation(builder.Configuration, emailService);
-
+// Register API explorer and Swagger.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerDocument();
 
-builder.Services.AddAutoMapper(config =>
-    config.AddProfile<AutoMapperProfile>(), typeof(Program).Assembly);
+// Register database-related services.
+builder.Services.AddInvestmentDatabase(builder.Configuration, emailService);
+builder.Services.AddGeolocationDatabase(builder.Configuration, emailService);
 
-builder.Services.AddTransient<IInvestmentService, InvestmentService>();
+// Register application services and configure HttpClient for GeolocationService.
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
+builder.Services.AddTransient<IInvestmentService, InvestmentService>();
 builder.Services.AddHttpClient<IGeolocationService, GeolocationService>();
 
-// Client service
+// Register client services and configure HttpClient for ApiClient.
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IExportService, ExportService>();
@@ -69,6 +77,7 @@ builder.Services.AddHttpClient<IApiClient, ApiClient>(config =>
 
 var app = builder.Build();
 
+// Apply RequestInfoMiddleware only for requests to the root path ("/").
 app.UseWhen(
     context => context.Request.Path.Equals("/"),
     appBuilder => appBuilder.UseMiddleware<RequestInfoMiddleware>());
@@ -76,15 +85,16 @@ app.UseWhen(
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    // Enable debugging and Swagger UI in development.
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 else
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    // Handle exceptions and enforce HTTPS in production.
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);    
+    app.UseHsts();  // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 }
 
 app.UseHttpsRedirection();
@@ -92,18 +102,19 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+// Configure Razor Components.
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(InvestmentPortfolio.Client._Imports).Assembly);
 
-// Database
-app.UseDatabaseInvestment(emailService);
-app.UseDatabaseGeolocation(emailService);
+// Apply database migrations
+app.UseInvestmentDatabase(emailService);
+app.UseGeolocationDatabase(emailService);
 
-// minimal API
-app.MapEndpointsInvestments();
-app.MapEndpointsGeolocations();
-app.MapEndpointsClientErrors();
+// Map application endpoints.
+app.MapInvestmentEndpoints();
+app.MapGeolocationEndpoints();
+app.MapClientErrorEndpoints();
 
 app.Run();
