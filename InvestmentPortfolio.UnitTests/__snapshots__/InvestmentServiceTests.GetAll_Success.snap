@@ -11,7 +11,7 @@
       "ValueCzk": 22500,
       "PercentageShare": 33.33,
       "NamePercentageShare": "Investice CZK (33,33 %)",
-      "CreatedDate": "0001-01-01T00:00:00+00:00",
+      "CreatedAt": "0001-01-01T00:00:00+00:00",
       "DefaultValueCzk": 0,
       "PerformanceCzk": 0,
       "PerformancePercentage": 0.0
@@ -24,7 +24,7 @@
       "ValueCzk": 22500,
       "PercentageShare": 33.33,
       "NamePercentageShare": "Investice USD (33,33 %)",
-      "CreatedDate": "0001-01-01T00:00:00+00:00",
+      "CreatedAt": "0001-01-01T00:00:00+00:00",
       "DefaultValueCzk": 21375,
       "PerformanceCzk": 1125,
       "PerformancePercentage": 5.26
@@ -37,7 +37,7 @@
       "ValueCzk": 22500,
       "PercentageShare": 33.33,
       "NamePercentageShare": "Investice HUF (33,33 %)",
-      "CreatedDate": "0001-01-01T00:00:00+00:00",
+      "CreatedAt": "0001-01-01T00:00:00+00:00",
       "DefaultValueCzk": 21375,
       "PerformanceCzk": 1125,
       "PerformancePercentage": 5.26

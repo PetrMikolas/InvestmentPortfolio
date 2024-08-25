@@ -900,9 +900,9 @@ namespace InvestmentPortfolio.Client.Services.Api
         /// Gets or sets the date and time when the investment was created.
         /// </summary>
 
-        [System.Text.Json.Serialization.JsonPropertyName("createdDate")]
+        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTime CreatedDate { get; set; }
+        public System.DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// Gets or sets the default value of the investment in Czech Koruna (CZK).

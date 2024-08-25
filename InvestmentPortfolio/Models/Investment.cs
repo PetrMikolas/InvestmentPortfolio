@@ -43,7 +43,7 @@ public sealed class Investment
     /// <summary>
     /// Gets or sets the date and time when the investment was created.
     /// </summary>
-    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the default value of the investment in Czech Koruna (CZK).
