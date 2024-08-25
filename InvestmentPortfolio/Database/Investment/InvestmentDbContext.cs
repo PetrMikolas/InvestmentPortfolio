@@ -20,8 +20,8 @@ internal sealed class InvestmentDbContext : DbContext
             entity.Property(p => p.Name).IsRequired().HasMaxLength(60);
             entity.Property(p => p.Value).IsRequired();
             entity.Property(p => p.CurrencyCode).IsRequired().HasMaxLength(3);
-            entity.Property(p => p.CreatedDate).IsRequired();
-            entity.Property(p => p.ModifiedDate).IsRequired(false);
+            entity.Property(p => p.CreatedAt).IsRequired();
+            entity.Property(p => p.UpdatedAt).IsRequired(false);
             entity.Property(p => p.DefaultValueCzk).IsRequired(false);
         });
     }
@@ -39,10 +39,10 @@ internal sealed class InvestmentDbContext : DbContext
         switch (entry.State)
         {
             case EntityState.Added:
-                ((InvestmentEntity)entry.Entity).CreatedDate = DateTimeOffset.UtcNow;
+                ((InvestmentEntity)entry.Entity).CreatedAt = DateTimeOffset.UtcNow;
                 break;
             case EntityState.Modified:
-                ((InvestmentEntity)entry.Entity).ModifiedDate = DateTimeOffset.UtcNow;
+                ((InvestmentEntity)entry.Entity).UpdatedAt = DateTimeOffset.UtcNow;
                 break;
         }
     }

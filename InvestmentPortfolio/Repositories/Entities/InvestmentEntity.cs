@@ -33,10 +33,10 @@ public class InvestmentEntity
     /// <summary>
     /// Gets or sets the date and time when the investment was created.
     /// </summary>
-    public DateTimeOffset CreatedDate { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
-    /// Gets or sets the date and time when the investment was last modified.
+    /// Gets or sets the date and time when the investment was last updated.
     /// </summary>
-    public DateTimeOffset? ModifiedDate { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
 }

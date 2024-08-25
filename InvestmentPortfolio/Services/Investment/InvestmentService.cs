@@ -202,7 +202,7 @@ internal sealed class InvestmentService(IInvestmentRepository repository, IExcha
         {
             var exchangeRates = await GetExchangeRatesAsync(true, cancellationToken);
 
-            currentInvestment.CreatedDate = DateTimeOffset.UtcNow;
+            currentInvestment.CreatedAt = DateTimeOffset.UtcNow;  // Původní hodnota se musí přepsat kvůli sledování výkonosti investic
             currentInvestment.DefaultValueCzk = CalculateValueCzk(entity.Value, entity.CurrencyCode, exchangeRates.Items);
         }
 
