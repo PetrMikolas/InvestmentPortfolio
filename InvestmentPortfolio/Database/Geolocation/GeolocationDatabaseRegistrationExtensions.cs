@@ -11,6 +11,10 @@ namespace InvestmentPortfolio.Database.Geolocation;
 /// </summary>
 public static class GeolocationDatabaseRegistrationExtensions
 {
+    private static readonly ILogger _logger = LoggerFactory
+        .Create(builder => builder.AddConsole().AddDebug())
+        .CreateLogger(typeof(GeolocationDatabaseRegistrationExtensions));
+
     /// <summary>
     /// Adds database services related to geolocation to the specified <see cref="IServiceCollection"/>.
     /// </summary>
@@ -22,13 +26,12 @@ public static class GeolocationDatabaseRegistrationExtensions
     {
         var connectionString = configuration.GetConnectionString("Geolocation");
 
-        if (string.IsNullOrEmpty(connectionString))
+        if (string.IsNullOrWhiteSpace(connectionString))
         {
-            string errorMessage = "Nelze získat connection string na připojení databáze Geolocation";
-            Type classType = typeof(GeolocationDatabaseRegistrationExtensions);
+            string errorMessage = "Nelze získat connection string na připojení databáze Geolocation";           
 
-            _ = email.SendErrorAsync(errorMessage, classType, nameof(AddGeolocationDatabase));
-            LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger(classType).LogError(errorMessage);
+            _ = email.SendErrorAsync(errorMessage, typeof(GeolocationDatabaseRegistrationExtensions), nameof(AddGeolocationDatabase));
+            _logger.LogError(errorMessage);
 
             return services;
         }
@@ -69,7 +72,7 @@ public static class GeolocationDatabaseRegistrationExtensions
             catch (Exception ex)
             {
                 _ = email.SendErrorAsync(ex.ToString());
-                app.Logger.LogError(ex.ToString());
+                _logger.LogError(ex.ToString());
 
                 return app;
             }

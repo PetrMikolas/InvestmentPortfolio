@@ -13,6 +13,10 @@ namespace InvestmentPortfolio.Database;
 /// </summary>
 public static class InvestmentDatabaseRegistrationExtensions
 {
+    private static readonly ILogger _logger = LoggerFactory
+        .Create(builder => builder.AddConsole().AddDebug())
+        .CreateLogger(typeof(InvestmentDatabaseRegistrationExtensions));
+
     /// <summary>
     /// Adds database services related to investments to the specified <see cref="IServiceCollection"/>.
     /// </summary>
@@ -24,13 +28,12 @@ public static class InvestmentDatabaseRegistrationExtensions
     {
         var connectionString = configuration.GetConnectionString("Investment");
 
-        if (string.IsNullOrEmpty(connectionString))
+        if (string.IsNullOrWhiteSpace(connectionString))
         {            
-            string errorMessage = "Nelze získat connection string na připojení databáze Investment";
-            Type classType = typeof(InvestmentDatabaseRegistrationExtensions);
+            string errorMessage = "Nelze získat connection string na připojení databáze Investment";            
 
-            _ = email.SendErrorAsync(errorMessage, classType, nameof(AddInvestmentDatabase));
-            LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger(classType).LogError(errorMessage);
+            _ = email.SendErrorAsync(errorMessage, typeof(InvestmentDatabaseRegistrationExtensions), nameof(AddInvestmentDatabase));
+            _logger.LogError(errorMessage); 
 
             return services;
         }
@@ -71,7 +74,7 @@ public static class InvestmentDatabaseRegistrationExtensions
             catch (Exception ex)
             {
                 _ = email.SendErrorAsync(ex.ToString());
-                app.Logger.LogError(ex.ToString());
+                _logger.LogError(ex.ToString());
 
                 return app;
             }

@@ -4,7 +4,7 @@ public static class SentryRegistrationExtensions
 {
     private static readonly ILogger _logger = LoggerFactory
         .Create(builder => builder.AddConsole().AddDebug())
-        .CreateLogger(typeof(SentryRegistrationExtensions).FullName ?? nameof(SentryRegistrationExtensions));
+        .CreateLogger(typeof(SentryRegistrationExtensions));
 
     /// <summary>
     /// Adds Sentry services to the <see cref="IWebHostBuilder"/> using the provided configuration.
