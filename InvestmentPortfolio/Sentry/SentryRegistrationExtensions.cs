@@ -1,10 +1,10 @@
 ﻿namespace InvestmentPortfolio.Sentry;
 
-public static class SentryExtensions
+public static class SentryRegistrationExtensions
 {
     private static readonly ILogger _logger = LoggerFactory
         .Create(builder => builder.AddConsole().AddDebug())
-        .CreateLogger(typeof(SentryExtensions).FullName ?? nameof(SentryExtensions));
+        .CreateLogger(typeof(SentryRegistrationExtensions).FullName ?? nameof(SentryRegistrationExtensions));
 
     /// <summary>
     /// Adds Sentry services to the <see cref="IWebHostBuilder"/> using the provided configuration.
