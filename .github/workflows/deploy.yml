@@ -29,7 +29,7 @@ jobs:
         port: ${{ secrets.NAS_PORT }}
         script: |          
           echo "Change to the target directory on NAS"
-          cd /volume1/docker/cookbook          
+          cd /volume1/docker/investmentportfolio          
 
           echo "Pull the latest image from Docker Hub"
           /usr/local/bin/docker pull dockerhub.petrmikolas.cz/investmentportfolio:latest
