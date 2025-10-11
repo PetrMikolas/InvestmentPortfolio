@@ -6,10 +6,8 @@ namespace InvestmentPortfolio.Database.Geolocation;
 /// <summary>
 /// Represents the database context for geolocation data.
 /// </summary>
-internal sealed class GeolocationDbContext : DbContext
+internal sealed class GeolocationDbContext(DbContextOptions<GeolocationDbContext> options) : DbContext(options)
 {
-    public GeolocationDbContext(DbContextOptions<GeolocationDbContext> options) : base(options) { }
-
     public DbSet<GeolocationEntity> Geolocations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -22,7 +20,7 @@ internal sealed class GeolocationDbContext : DbContext
             entity.Property(p => p.Country).IsRequired().HasMaxLength(50);
             entity.Property(p => p.Isp).IsRequired().HasMaxLength(100);
             entity.Property(p => p.LocalDate).IsRequired().HasMaxLength(20);
-            entity.Property(p => p.Referer).IsRequired().HasMaxLength(150);
+            entity.Property(p => p.Referer).IsRequired().HasMaxLength(150);            
         });
     }
 }

@@ -3,6 +3,7 @@ using InvestmentPortfolio.Database.Geolocation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InvestmentPortfolio.Migrations.GeolocationDb
 {
     [DbContext(typeof(GeolocationDbContext))]
-    partial class GeolocationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251011160050_AddUserAgentPropertyToGeolocationEntity")]
+    partial class AddUserAgentPropertyToGeolocationEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

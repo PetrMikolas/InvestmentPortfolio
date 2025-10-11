@@ -8,6 +8,7 @@
 /// <param name="Country">The country.</param>
 /// <param name="Isp">The Internet Service Provider (ISP).</param>
 /// <param name="LocalDate">The local date.</param>
+/// <param name="UserAgent">The user agent header sent by the client.</param>
 /// <param name="Referer">The referer.</param>
 public record GeolocationDto
 (
@@ -16,5 +17,6 @@ public record GeolocationDto
     string Country,
     string Isp,
     string LocalDate,
+    string UserAgent,
     string Referer
 );

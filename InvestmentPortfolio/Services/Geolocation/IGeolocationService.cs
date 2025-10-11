@@ -9,7 +9,8 @@ public interface IGeolocationService
     /// Asynchronously retrieves geolocation data based on the provided IP address.
     /// </summary>
     /// <param name="ipAddress">The IP address to retrieve geolocation data for.</param>
-    /// <param name="referer">The referer URL (optional). Defaults to an empty string.</param>
+    /// <param name="userAgent">The User-Agent header value sent by the client.</param>
+    /// <param name="referer">The referer URL.</param>
     /// <param name="cancellationToken">The cancellation token (optional). Defaults to <see cref="CancellationToken.None"/>.</param>
-    Task GetGeolocationAsync(string ipAddress, string referer = "", CancellationToken cancellationToken = default);
+    Task GetGeolocationAsync(string ipAddress, string userAgent, string referer, CancellationToken cancellationToken = default);
 }

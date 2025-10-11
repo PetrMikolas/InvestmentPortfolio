@@ -1153,6 +1153,14 @@ namespace InvestmentPortfolio.Client.Services.Api
         public string LocalDate { get; set; }
 
         /// <summary>
+        /// The user agent header sent by the client.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("userAgent")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string UserAgent { get; set; }
+
+        /// <summary>
         /// The referer.
         /// </summary>
 

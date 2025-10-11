@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using FluentAssertions;
 using InvestmentPortfolio.Models;
-using InvestmentPortfolio.Repositories;
 using InvestmentPortfolio.Repositories.Entities;
+using InvestmentPortfolio.Repositories.Investment;
 using InvestmentPortfolio.Services.ExchangeRate;
 using InvestmentPortfolio.Services.Investment;
 using Microsoft.Extensions.Caching.Memory;

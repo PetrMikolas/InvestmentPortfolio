@@ -6,10 +6,8 @@ namespace InvestmentPortfolio.Database.Investment;
 /// <summary>
 /// Represents the database context for investments.
 /// </summary>
-internal sealed class InvestmentDbContext : DbContext
+internal sealed class InvestmentDbContext(DbContextOptions<InvestmentDbContext> options) : DbContext(options)
 {
-    public InvestmentDbContext(DbContextOptions<InvestmentDbContext> options) : base(options) { }
-
     public DbSet<InvestmentEntity> Investments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

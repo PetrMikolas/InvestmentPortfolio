@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using InvestmentPortfolio.Commands.Investment;
 using InvestmentPortfolio.Repositories.Entities;
 using InvestmentPortfolio.Services.Investment;
 using MediatR;

@@ -17,7 +17,7 @@ namespace InvestmentPortfolio.Services.Geolocation;
 /// <param name="logger">The logger instance for logging errors.</param>
 internal sealed class GeolocationService(HttpClient httpClient, IGeolocationRepository geolocationRepository, IMapper mapper, IEmailService email, ILogger<GeolocationService> logger) : IGeolocationService
 {
-    public async Task GetGeolocationAsync(string ipAddress, string referer = "", CancellationToken cancellationToken = default)
+    public async Task GetGeolocationAsync(string ipAddress, string userAgent, string referer, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(ipAddress) || ipAddress.Contains("192.168.1."))
         {
@@ -33,7 +33,7 @@ internal sealed class GeolocationService(HttpClient httpClient, IGeolocationRepo
                 return;
             }
 
-            string responseContent = await response.Content.ReadAsStringAsync();
+            string responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
             var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
             var geolocation = JsonSerializer.Deserialize<GeolocationApi>(responseContent, options);
 
@@ -44,7 +44,8 @@ internal sealed class GeolocationService(HttpClient httpClient, IGeolocationRepo
 
             var geolocationEntity = mapper.Map<GeolocationEntity>(geolocation);
             geolocationEntity.LocalDate = DateTime.Now.ToString();
-            geolocationEntity.Referer = referer ?? string.Empty;
+            geolocationEntity.UserAgent = userAgent;
+            geolocationEntity.Referer = referer;
 
             await email.SendObjectAsync(geolocationEntity, "Investiční portfolio - geolocation", cancellationToken);
             await geolocationRepository.CreateAsync(geolocationEntity, cancellationToken);

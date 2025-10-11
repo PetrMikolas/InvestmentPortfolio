@@ -1,12 +1,10 @@
-﻿using InvestmentPortfolio.Database.Investment;
-using InvestmentPortfolio.Helpers;
-using InvestmentPortfolio.Repositories;
+﻿using InvestmentPortfolio.Helpers;
 using InvestmentPortfolio.Repositories.Investment;
 using InvestmentPortfolio.Services.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace InvestmentPortfolio.Database;
+namespace InvestmentPortfolio.Database.Investment;
 
 /// <summary>
 /// Provides extension method for configuring database services related to investments.
@@ -29,11 +27,11 @@ public static class InvestmentDatabaseRegistrationExtensions
         var connectionString = configuration.GetConnectionString("Investment");
 
         if (string.IsNullOrWhiteSpace(connectionString))
-        {            
-            string errorMessage = "Nelze získat connection string na připojení databáze Investment";            
+        {
+            string errorMessage = "Nelze získat connection string na připojení databáze Investment";
 
             _ = email.SendErrorAsync(errorMessage, typeof(InvestmentDatabaseRegistrationExtensions), nameof(AddInvestmentDatabase));
-            _logger.LogError(errorMessage); 
+            _logger.LogError(errorMessage);
 
             return services;
         }
@@ -41,7 +39,7 @@ public static class InvestmentDatabaseRegistrationExtensions
         services.AddDbContext<InvestmentDbContext>(options =>
         {
             options.UseSqlServer(connectionString, opts =>
-            {                
+            {
                 opts.MigrationsHistoryTable("MigrationHistory_Investment");
             });
         });
@@ -68,7 +66,7 @@ public static class InvestmentDatabaseRegistrationExtensions
             try
             {
                 using var scope = app.Services.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<InvestmentDbContext>();                
+                var dbContext = scope.ServiceProvider.GetRequiredService<InvestmentDbContext>();
                 dbContext.Database.Migrate();
             }
             catch (Exception ex)

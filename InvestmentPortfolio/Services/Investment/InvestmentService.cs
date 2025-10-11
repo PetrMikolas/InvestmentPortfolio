@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using InvestmentPortfolio.Models;
-using InvestmentPortfolio.Repositories;
 using InvestmentPortfolio.Repositories.Entities;
+using InvestmentPortfolio.Repositories.Investment;
 using InvestmentPortfolio.Services.ExchangeRate;
 using Microsoft.Extensions.Caching.Memory;
 

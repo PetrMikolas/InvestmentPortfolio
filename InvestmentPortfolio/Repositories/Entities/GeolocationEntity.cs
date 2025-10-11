@@ -39,4 +39,9 @@ public class GeolocationEntity
     /// Represents the referer associated with the geolocation entity.
     /// </summary>
     public string Referer { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Represents the User-Agent header sent by the client.
+    /// </summary>
+    public string UserAgent { get; set; } = string.Empty;
 }

@@ -1,7 +1,7 @@
 ﻿using InvestmentPortfolio.Exceptions;
 using InvestmentPortfolio.Repositories.Entities;
 
-namespace InvestmentPortfolio.Repositories;
+namespace InvestmentPortfolio.Repositories.Investment;
 
 /// <summary>
 /// Represents a repository for managing investment entities in the database.

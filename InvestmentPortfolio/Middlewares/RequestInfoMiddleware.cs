@@ -12,8 +12,9 @@ public sealed class RequestInfoMiddleware(IGeolocationService geolocationService
     {        
         var cancellationToken = context.RequestAborted;
         string clientIp = context.Request.Headers["X-Real-IP"].ToString();
+        string userAgent = context.Request.Headers.UserAgent.ToString();
         string referer = context.Request.Headers.Referer.ToString();
-        await geolocationService.GetGeolocationAsync(clientIp, referer, cancellationToken);
+        await geolocationService.GetGeolocationAsync(clientIp, userAgent, referer, cancellationToken);
 
         await next(context);
     }
