@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ "master" ]  
+    branches: [ "master" ]
 
 jobs:
   deploy:
@@ -12,13 +12,23 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login dockerhub.petrmikolas.cz -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin 
+      run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login dockerhub.petrmikolas.cz -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
     - name: Build Docker image
       run: docker build . -f ./InvestmentPortfolio/Dockerfile -t dockerhub.petrmikolas.cz/investmentportfolio:latest
 
     - name: Push Docker image to Docker Hub
       run: docker push dockerhub.petrmikolas.cz/investmentportfolio:latest
+
+    - name: Copy compose.yaml to NAS
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.NAS_HOST }}
+        username: ${{ secrets.NAS_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.NAS_PORT }}
+        source: "./InvestmentPortfolio/compose.yaml"
+        target: "/volume1/docker/investmentportfolio/compose.yaml"
 
     - name: Deploy on NAS
       uses: appleboy/ssh-action@v1.2.0
@@ -31,7 +41,7 @@ jobs:
           set -e
           
           echo "Changing to target directory on NAS"
-          cd /volume1/docker/investmentportfolio          
+          cd /volume1/docker/investmentportfolio
 
           echo "Stopping existing containers (if any)"
           /usr/local/bin/docker-compose -f compose.yaml down || true
