@@ -12,10 +12,10 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Log in to Docker Hub
-      run: echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login dockerhub.petrmikolas.cz -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin 
+      run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login dockerhub.petrmikolas.cz -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin 
 
     - name: Build Docker image
-      run: docker build . --file ./InvestmentPortfolio/Dockerfile --tag dockerhub.petrmikolas.cz/investmentportfolio:latest
+      run: docker build . -f ./InvestmentPortfolio/Dockerfile -t dockerhub.petrmikolas.cz/investmentportfolio:latest
 
     - name: Push Docker image to Docker Hub
       run: docker push dockerhub.petrmikolas.cz/investmentportfolio:latest
@@ -27,16 +27,22 @@ jobs:
         username: ${{ secrets.NAS_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.NAS_PORT }}
-        script: |          
-          echo "Change to the target directory on NAS"
-          cd /volume1/docker/investmentportfolio     
+        script: |
+          set -e
           
-          echo "Remove old image"
-          /usr/local/bin/docker image rm -f dockerhub.petrmikolas.cz/investmentportfolio:latest || true
+          echo "Changing to target directory on NAS"
+          cd /volume1/docker/investmentportfolio
 
-          echo "Pull the latest image from Docker Hub"
-          /usr/local/bin/docker pull --quiet dockerhub.petrmikolas.cz/investmentportfolio:latest
-                    
-          echo "Updating and restarting Docker containers"
-          /usr/local/bin/docker-compose --file compose.yaml down
-          /usr/local/bin/docker-compose --file compose.yaml up -d
+          echo "Pulling latest image from Docker Hub"
+          /usr/local/bin/docker pull dockerhub.petrmikolas.cz/investmentportfolio:latest
+
+          echo "Stopping existing containers (if any)"
+          /usr/local/bin/docker-compose -f compose.yaml down || true
+
+          echo "Removing orphaned containers"
+          /usr/local/bin/docker ps -aq --filter "name=investment-portfolio" | xargs -r /usr/local/bin/docker rm || true
+
+          echo "Starting new containers"
+          /usr/local/bin/docker-compose -f compose.yaml up -d
+
+          echo "Deployment completed successfully."
