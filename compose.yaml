@@ -4,10 +4,13 @@ services:
   investment-portfolio:    
     container_name: investment-portfolio
     image: dockerhub.petrmikolas.cz/investmentportfolio:latest   
+    user: root
     environment:
      - ASPNETCORE_ENVIRONMENT=Production
     restart: unless-stopped      
     ports:
       - 5600:8080  
       - 5601:8081   
-    network_mode: bridge
+    volumes:     
+      - ./appsettings.Production.json:/app/appsettings.Production.json
+    network_mode: bridge 
