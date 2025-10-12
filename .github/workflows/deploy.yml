@@ -28,7 +28,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.NAS_PORT }}
         source: "./compose.yaml"
-        target: "/volume1/docker/investmentportfolio/compose.yaml"
+        target: "/volume1/docker/investmentportfolio/"
 
     - name: Deploy on NAS
       uses: appleboy/ssh-action@v1.2.0
