@@ -27,7 +27,7 @@ jobs:
         username: ${{ secrets.NAS_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.NAS_PORT }}
-        source: "InvestmentPortfolio/compose.yaml"
+        source: "./compose.yaml"
         target: "/volume1/docker/investmentportfolio/compose.yaml"
 
     - name: Deploy on NAS
