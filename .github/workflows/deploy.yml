@@ -29,10 +29,13 @@ jobs:
         port: ${{ secrets.NAS_PORT }}
         script: |          
           echo "Change to the target directory on NAS"
-          cd /volume1/docker/investmentportfolio          
+          cd /volume1/docker/investmentportfolio     
+          
+          echo "Remove old image"
+          /usr/local/bin/docker image rm -f dockerhub.petrmikolas.cz/investmentportfolio:latest || true
 
           echo "Pull the latest image from Docker Hub"
-          /usr/local/bin/docker pull dockerhub.petrmikolas.cz/investmentportfolio:latest
+          /usr/local/bin/docker pull --quiet dockerhub.petrmikolas.cz/investmentportfolio:latest
                     
           echo "Updating and restarting Docker containers"
           /usr/local/bin/docker-compose --file compose.yaml down
