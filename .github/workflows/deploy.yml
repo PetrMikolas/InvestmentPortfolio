@@ -27,20 +27,13 @@ jobs:
         username: ${{ secrets.NAS_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.NAS_PORT }}
-        script: |
-          echo "==> Connecting to NAS and switching to project directory"
-          cd /volume1/docker/investmentportfolio || exit 1
-    
-          echo "==> Pulling the latest Docker image"
-          /usr/local/bin/docker pull dockerhub.***mikolas.cz/investmentportfolio:latest
-    
-          echo "==> Removing old container if it exists"
-          /usr/local/bin/docker rm -f investment-portfolio || true
-    
-          echo "==> Stopping and cleaning old compose project"
-          /usr/local/bin/docker-compose --project-name investmentportfolio --file compose.yaml down --remove-orphans || true
-    
-          echo "==> Starting updated containers"
-          /usr/local/bin/docker-compose --project-name investmentportfolio --file compose.yaml up -d
-    
-          echo "==> Deployment completed successfully ✅"
+        script: |          
+          echo "Change to the target directory on NAS"
+          cd /volume1/docker/investmentportfolio          
+
+          echo "Pull the latest image from Docker Hub"
+          /usr/local/bin/docker pull dockerhub.petrmikolas.cz/investmentportfolio:latest
+                    
+          echo "Updating and restarting Docker containers"
+          /usr/local/bin/docker-compose --file compose.yaml down
+          /usr/local/bin/docker-compose --file compose.yaml up -d
