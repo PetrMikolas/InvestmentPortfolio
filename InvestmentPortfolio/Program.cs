@@ -53,7 +53,7 @@ var emailService = new EmailService(optionsEmailService, loggerEmailService);
 // Add Data Protection with persistent keys
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(@"/app/Keys"))
-    .SetApplicationName("InvestmentPortfolio");
+    .SetApplicationName("investment-portfolio");
 
 // Register API explorer and Swagger.
 builder.Services.AddEndpointsApiExplorer();
