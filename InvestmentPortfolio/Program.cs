@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
+using Radzen;
 using InvestmentPortfolio.Api.ErrorsClient;
 using InvestmentPortfolio.Api.Geolocation;
 using InvestmentPortfolio.Api.Investments;
@@ -13,9 +17,6 @@ using InvestmentPortfolio.Services.Email;
 using InvestmentPortfolio.Services.ExchangeRate;
 using InvestmentPortfolio.Services.Geolocation;
 using InvestmentPortfolio.Services.Investment;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Options;
-using Radzen;
 using static InvestmentPortfolio.Services.Email.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -99,7 +100,15 @@ else
     app.UseHsts();  // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 }
 
-app.UseHttpsRedirection();
+// Behind reverse proxy (Synology NAS) – forward original HTTPS scheme and client IP
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+// Not used in Docker – HTTPS is handled by the proxy (avoids warning or redirect loop)
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
