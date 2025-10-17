@@ -13,6 +13,7 @@ using InvestmentPortfolio.Services.Email;
 using InvestmentPortfolio.Services.ExchangeRate;
 using InvestmentPortfolio.Services.Geolocation;
 using InvestmentPortfolio.Services.Investment;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using Radzen;
 using static InvestmentPortfolio.Services.Email.EmailService;
@@ -48,6 +49,11 @@ builder.Services
 var loggerEmailService = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<EmailService>();
 var optionsEmailService = Options.Create(new EmailOptions());
 var emailService = new EmailService(optionsEmailService, loggerEmailService);
+
+// Add Data Protection with persistent keys
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"/app/Keys"))
+    .SetApplicationName("InvestmentPortfolio");
 
 // Register API explorer and Swagger.
 builder.Services.AddEndpointsApiExplorer();
