@@ -100,13 +100,6 @@ else
     app.UseHsts();  // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 }
 
-// Behind reverse proxy (Synology NAS) – forward original HTTPS scheme and client IP
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders =
-        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
 // Not used in Docker – HTTPS is handled by the proxy (avoids warning or redirect loop)
 //app.UseHttpsRedirection();
 
