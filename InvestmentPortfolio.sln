@@ -8,7 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{744E9664-1E8B-4C60-9DCB-478264F9E397}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
-		docker-compose.yaml = docker-compose.yaml
+		compose.yaml = compose.yaml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvestmentPortfolio.IntegrationTests", "InvestmentPortfolio.IntegrationTests\InvestmentPortfolio.IntegrationTests.csproj", "{7F65AB1E-C05D-4BDD-935D-B112E1586832}"
