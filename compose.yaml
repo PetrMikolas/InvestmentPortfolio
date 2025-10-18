@@ -12,6 +12,6 @@ services:
       - 5600:8080  
       - 5601:8081   
     volumes:     
-      - ./appsettings.Production.json:/app/appsettings.Production.json
+      - ./appsettings.Production.json:/app/appsettings.Production.json:ro
       - ./DataProtectionKeys:/app/Keys
     network_mode: bridge 
