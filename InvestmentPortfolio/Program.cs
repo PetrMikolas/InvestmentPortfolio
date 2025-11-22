@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
 using Radzen;
 using InvestmentPortfolio.Api.ErrorsClient;
@@ -96,7 +95,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     // Handle exceptions and enforce HTTPS in production.
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);    
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();  // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 }
 
