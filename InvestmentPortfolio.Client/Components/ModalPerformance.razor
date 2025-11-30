@@ -1,7 +1,7 @@
 ﻿@if (!IsOpen || Investments is null || _data.Count == 0 || Investments.ExchangeRates.Items.Count == 0) return;
 
 <div class="modal d-flex justify-content-center align-items-center bg-dark bg-opacity-50" @onclick="CancelForm">
-    <div class="modal-dialog" style="min-width:1094px;" @onclick:stopPropagation=true>
+    <div class="modal-dialog" style="min-width:1120px;" @onclick:stopPropagation=true>
         <div class="modal-content" style="user-select:none">
             <div class="modal-header bg-light">
                 <h5 class="modal-title me-3">Výkonnost investic v závislosti na devizových kurzech</h5>
