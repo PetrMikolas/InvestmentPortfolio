@@ -2,7 +2,7 @@
 
 Webová aplikace pro evidenci investic, stahování aktuálních devizových kurzů z API České národní banky a přepočet investic v cizí měně na Kč. Přehled investic je zobrazen ve výsečovém grafu.
 
-Naprogramováno v jazyce C# v prostředí Microsoft .NET 8 
+Naprogramováno v jazyce C# v prostředí Microsoft .NET 10 
 
 - App/Client - ASP.NET Core (Blazor Web App) 
 - API - Minimal API
