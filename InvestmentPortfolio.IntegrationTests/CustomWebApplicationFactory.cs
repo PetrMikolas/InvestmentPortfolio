@@ -16,7 +16,7 @@ internal class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            services.RemoveAll(typeof(DbContextOptions<InvestmentDbContext>));
+            services.RemoveAll<DbContextOptions<InvestmentDbContext>>();
 
             services.AddDbContext<InvestmentDbContext>(options =>
             {

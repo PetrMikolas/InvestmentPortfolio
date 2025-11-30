@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Options;
-using Radzen;
 using InvestmentPortfolio.Api.ErrorsClient;
 using InvestmentPortfolio.Api.Geolocation;
 using InvestmentPortfolio.Api.Investments;
@@ -16,6 +13,9 @@ using InvestmentPortfolio.Services.Email;
 using InvestmentPortfolio.Services.ExchangeRate;
 using InvestmentPortfolio.Services.Geolocation;
 using InvestmentPortfolio.Services.Investment;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Options;
+using Radzen;
 using static InvestmentPortfolio.Services.Email.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -96,7 +96,7 @@ else
 {
     // Handle exceptions and enforce HTTPS in production.
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();  // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
 
 // Not used in Docker – HTTPS is handled by the proxy (avoids warning or redirect loop)
@@ -105,13 +105,17 @@ else
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+// Map static assets only when NSWAG is not generating the client.
+if (Environment.GetEnvironmentVariable("NSWAG_RUNNING") is not "true")
+    app.MapStaticAssets();
+
 // Configure Razor Components.
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(InvestmentPortfolio.Client._Imports).Assembly);
 
-// Apply database migrations
+// Apply database migrations.
 app.UseInvestmentDatabase(emailService);
 app.UseGeolocationDatabase(emailService);
 

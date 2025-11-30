@@ -25,7 +25,7 @@ public static class InvestmentDatabaseRegistrationExtensions
     public static IServiceCollection AddInvestmentDatabase(this IServiceCollection services, IConfiguration configuration, IEmailService email)
     {
         var connectionString = configuration.GetConnectionString("Investment");
-
+       
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             string errorMessage = "Nelze získat connection string na připojení databáze Investment";
@@ -36,13 +36,16 @@ public static class InvestmentDatabaseRegistrationExtensions
             return services;
         }
 
-        services.AddDbContext<InvestmentDbContext>(options =>
+        if (configuration["environment"] is not "IntegrationTests")
         {
-            options.UseSqlServer(connectionString, opts =>
+            services.AddDbContext<InvestmentDbContext>(options =>
             {
-                opts.MigrationsHistoryTable("MigrationHistory_Investment");
+                options.UseSqlServer(connectionString, opts =>
+                {
+                    opts.MigrationsHistoryTable("MigrationHistory_Investment");
+                });
             });
-        });
+        }
 
         services.AddDatabaseDeveloperPageExceptionFilter();
         services.RemoveAll<IInvestmentRepository>();
@@ -61,7 +64,7 @@ public static class InvestmentDatabaseRegistrationExtensions
     {
         var isRunningAutomatedTest = Helper.ParseBoolEnvironmentVariable("IS_RUNNING_AUTOMATED_TEST");
 
-        if (app.Environment.EnvironmentName != "IntegrationTests" && !isRunningAutomatedTest)
+        if (app.Environment.EnvironmentName is not "IntegrationTests" && !isRunningAutomatedTest)
         {
             try
             {
