@@ -6,7 +6,7 @@
 public static class Helper
 {
     private static readonly ILogger _logger = LoggerFactory
-            .Create(builder => builder.AddConsole().AddDebug())
+            .Create(builder => builder.AddConsole())
             .CreateLogger(typeof(Helper));
 
     /// <summary>
