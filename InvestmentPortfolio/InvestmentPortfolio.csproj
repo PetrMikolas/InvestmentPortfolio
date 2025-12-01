@@ -16,7 +16,7 @@
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Azure.Identity" Version="1.17.1" />
 		<PackageReference Include="MailKit" Version="4.14.1" />
-		<PackageReference Include="MediatR" Version="13.1.0" />
+		<PackageReference Include="MediatR" Version="12.5.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.0" />
@@ -48,9 +48,7 @@
 	</PropertyGroup>
 
 	<Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
-		<Exec WorkingDirectory="$(ProjectDir)"
-			  EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development; NSWAG_RUNNING=true"
-			  Command="$(NSwagExe_Net100) run nswag.json /variables:Configuration=$(Configuration)" />
+		<Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development; NSWAG_RUNNING=true" Command="$(NSwagExe_Net100) run nswag.json /variables:Configuration=$(Configuration)" />
 	</Target>
 
 </Project>
