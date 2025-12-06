@@ -11,10 +11,6 @@ namespace InvestmentPortfolio.Database.Geolocation;
 /// </summary>
 public static class GeolocationDatabaseRegistrationExtensions
 {
-    private static readonly ILogger _logger = LoggerFactory
-        .Create(builder => builder.AddConsole().AddDebug())
-        .CreateLogger(typeof(GeolocationDatabaseRegistrationExtensions));
-
     /// <summary>
     /// Adds database services related to geolocation to the specified <see cref="IServiceCollection"/>.
     /// </summary>
@@ -24,6 +20,7 @@ public static class GeolocationDatabaseRegistrationExtensions
     /// <returns>The collection of services with added database services.</returns>
     public static IServiceCollection AddGeolocationDatabase(this IServiceCollection services, IConfiguration configuration, IEmailService email)
     {
+        var logger = services.CreateAutoLogger();
         var connectionString = configuration.GetConnectionString("Geolocation");
 
         if (string.IsNullOrWhiteSpace(connectionString))
@@ -31,7 +28,7 @@ public static class GeolocationDatabaseRegistrationExtensions
             string errorMessage = "Nelze získat connection string na připojení databáze Geolocation";           
 
             _ = email.SendErrorAsync(errorMessage, typeof(GeolocationDatabaseRegistrationExtensions), nameof(AddGeolocationDatabase));
-            _logger.LogError(errorMessage);
+            logger.LogError(errorMessage);
 
             return services;
         }
@@ -59,7 +56,8 @@ public static class GeolocationDatabaseRegistrationExtensions
     /// <returns>The configured web application instance.</returns>
     public static WebApplication UseGeolocationDatabase(this WebApplication app, IEmailService email)
     {
-        var isRunningAutomatedTest = Helper.ParseBoolEnvironmentVariable("IS_RUNNING_AUTOMATED_TEST");
+        var logger = app.CreateAutoLogger();
+        var isRunningAutomatedTest = app.ParseBoolEnvironmentVariable("IS_RUNNING_AUTOMATED_TEST");
 
         if (app.Environment.EnvironmentName != "IntegrationTests" && !isRunningAutomatedTest)
         {
@@ -72,7 +70,7 @@ public static class GeolocationDatabaseRegistrationExtensions
             catch (Exception ex)
             {
                 _ = email.SendErrorAsync(ex.ToString());
-                _logger.LogError(ex.ToString());
+                logger.LogError(ex.ToString());
 
                 return app;
             }

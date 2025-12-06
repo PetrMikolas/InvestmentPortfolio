@@ -10,11 +10,7 @@ namespace InvestmentPortfolio.Database.Investment;
 /// Provides extension method for configuring database services related to investments.
 /// </summary>
 public static class InvestmentDatabaseRegistrationExtensions
-{
-    private static readonly ILogger _logger = LoggerFactory
-        .Create(builder => builder.AddConsole().AddDebug())
-        .CreateLogger(typeof(InvestmentDatabaseRegistrationExtensions));
-
+{   
     /// <summary>
     /// Adds database services related to investments to the specified <see cref="IServiceCollection"/>.
     /// </summary>
@@ -23,7 +19,8 @@ public static class InvestmentDatabaseRegistrationExtensions
     /// <param name="email">The service for sending email notifications.</param>
     /// <returns>The collection of services with added database services.</returns>
     public static IServiceCollection AddInvestmentDatabase(this IServiceCollection services, IConfiguration configuration, IEmailService email)
-    {
+    {  
+        var logger = services.CreateAutoLogger();       
         var connectionString = configuration.GetConnectionString("Investment");
        
         if (string.IsNullOrWhiteSpace(connectionString))
@@ -31,7 +28,7 @@ public static class InvestmentDatabaseRegistrationExtensions
             string errorMessage = "Nelze získat connection string na připojení databáze Investment";
 
             _ = email.SendErrorAsync(errorMessage, typeof(InvestmentDatabaseRegistrationExtensions), nameof(AddInvestmentDatabase));
-            _logger.LogError(errorMessage);
+            logger.LogError(errorMessage);
 
             return services;
         }
@@ -62,7 +59,8 @@ public static class InvestmentDatabaseRegistrationExtensions
     /// <returns>The configured web application instance.</returns>
     public static WebApplication UseInvestmentDatabase(this WebApplication app, IEmailService email)
     {
-        var isRunningAutomatedTest = Helper.ParseBoolEnvironmentVariable("IS_RUNNING_AUTOMATED_TEST");
+        var logger = app.CreateAutoLogger();
+        var isRunningAutomatedTest = app.ParseBoolEnvironmentVariable("IS_RUNNING_AUTOMATED_TEST");
 
         if (app.Environment.EnvironmentName is not "IntegrationTests" && !isRunningAutomatedTest)
         {
@@ -75,7 +73,7 @@ public static class InvestmentDatabaseRegistrationExtensions
             catch (Exception ex)
             {
                 _ = email.SendErrorAsync(ex.ToString());
-                _logger.LogError(ex.ToString());
+                logger.LogError(ex.ToString());
 
                 return app;
             }
