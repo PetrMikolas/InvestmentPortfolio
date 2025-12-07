@@ -15,7 +15,7 @@ public static class ApiClientErrorsRegistrationExtensions
     /// <returns>The web application with mapped endpoint for reporting errors.</returns>
     public static WebApplication MapClientErrorEndpoints(this WebApplication app)
     {
-        app.MapPost("errors", (
+        app.MapPost("errors", [EndpointSummary("Send an error")] (
             [FromBody] string errorMessage, 
             [FromServices] IEmailService email, 
             CancellationToken cancellationToken) =>
@@ -34,8 +34,7 @@ public static class ApiClientErrorsRegistrationExtensions
             return Results.NoContent();
         })
         .WithTags("Errors")
-        .WithName("SendError")
-        .WithOpenApi(operation => new(operation) { Summary = "Send an error" })
+        .WithName("SendError")        
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest);
 

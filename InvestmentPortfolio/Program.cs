@@ -14,7 +14,6 @@ using InvestmentPortfolio.Services.ExchangeRate;
 using InvestmentPortfolio.Services.Geolocation;
 using InvestmentPortfolio.Services.Investment;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Options;
 using Radzen;
 using static InvestmentPortfolio.Services.Email.EmailService;
 
@@ -45,11 +44,6 @@ builder.Services
     .Bind(builder.Configuration.GetSection(EmailOptions.Key))
     .ValidateDataAnnotations();
 
-// Create and configure email service instance.
-var loggerEmailService = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<EmailService>();
-var optionsEmailService = Options.Create(new EmailOptions());
-var emailService = new EmailService(optionsEmailService, loggerEmailService);
-
 // Add Data Protection with persistent keys
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(@"/app/Keys"))
@@ -61,13 +55,13 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerDocument();
 
 // Register database-related services.
-builder.Services.AddInvestmentDatabase(builder.Configuration, emailService);
-builder.Services.AddGeolocationDatabase(builder.Configuration, emailService);
+builder.Services.AddInvestmentDatabase(builder.Configuration);
+builder.Services.AddGeolocationDatabase(builder.Configuration);
 
 // Register application services and configure HttpClient for GeolocationService.
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
-builder.Services.AddTransient<IInvestmentService, InvestmentService>();
+builder.Services.AddScoped<IInvestmentService, InvestmentService>();
 builder.Services.AddHttpClient<IGeolocationService, GeolocationService>();
 
 // Register client services and configure HttpClient for ApiClient.
@@ -116,8 +110,8 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(InvestmentPortfolio.Client._Imports).Assembly);
 
 // Apply database migrations.
-app.UseInvestmentDatabase(emailService);
-app.UseGeolocationDatabase(emailService);
+await app.UseInvestmentDatabase();
+await app.UseGeolocationDatabase();
 
 // Map application endpoints.
 app.MapInvestmentEndpoints();

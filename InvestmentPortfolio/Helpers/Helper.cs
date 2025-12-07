@@ -16,7 +16,7 @@ public static class Helper
     /// <returns>The boolean value of the environment variable if successfully parsed; otherwise, the default value.</returns>
     public static bool ParseBoolEnvironmentVariable(this WebApplication app, string environmentVariableName, bool defaultValue = false)
     {
-        var logger = app.CreateAutoLogger();
+        var logger = app.CreateLogger();
         var value = Environment.GetEnvironmentVariable(environmentVariableName);
 
         if (string.IsNullOrEmpty(value))
@@ -35,35 +35,46 @@ public static class Helper
     }
 
     /// <summary>
-    /// Vytvoří logger s kategorií automaticky odvozenou z volajícího souboru,
-    /// pokud není explicitně předána.
+    /// Creates an <see cref="ILogger"/> using the specified <see cref="IServiceProvider"/>, generating the logger category automatically from the calling class and member name.
     /// </summary>
-    public static ILogger CreateAutoLogger(this IServiceCollection services, [CallerFilePath] string callerFilePath = "")
+    /// <remarks>
+    /// The logger category is constructed in the form "<c>{ClassName}.{MemberName}</c>", where <c>ClassName</c> is derived from <paramref name="callerFilePath"/> and
+    /// <c>MemberName</c> is derived from <paramref name="callerMemberName"/>. Both parameters are supplied automatically by the compiler.
+    /// </remarks>
+    /// <param name="provider"> The <see cref="IServiceProvider"/> used to resolve the <see cref="ILoggerFactory"/>.</param>
+    /// <param name="callerFilePath">Automatically supplied path of the source file containing the caller.</param>
+    /// <param name="callerMemberName">Automatically supplied name of the calling method or property.</param>
+    /// <returns>An <see cref="ILogger"/> instance with a category name derived from the calling file and member.</returns>
+    public static ILogger CreateLogger(this IServiceProvider provider, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerMemberName = "")
     {
-        using var provider = services.BuildServiceProvider();
         var factory = provider.GetRequiredService<ILoggerFactory>();
-
-        var categoryName = GetCategoryNameFromPath(callerFilePath);
+        var categoryName = GetCategoryName(callerFilePath, callerMemberName);
 
         return factory.CreateLogger(categoryName);
     }
 
     /// <summary>
-    /// Vytvoří logger z <see cref="WebApplication"/> s kategorií odvozenou z volajícího souboru.
+    /// Creates an <see cref="ILogger"/> for the specified <see cref="WebApplication"/>, using the calling file and member to determine the logger category.
     /// </summary>
-    public static ILogger CreateAutoLogger(this WebApplication app, [CallerFilePath] string callerFilePath = "")
+    /// <remarks>
+    /// The logger category is constructed as "<c>{ClassName}.{MemberName}</c>", where <c>ClassName</c> is derived from the calling file name and
+    /// <c>MemberName</c> is the name of the calling method or property. Both values are supplied automatically by the compiler.
+    /// </remarks>
+    /// <param name="app">The <see cref="WebApplication"/> from whose services the logger factory is resolved.</param>
+    /// <param name="callerFilePath">Automatically supplied path of the source file containing the caller.</param>
+    /// <param name="callerMemberName">Automatically supplied name of the calling method or property.</param>
+    /// <returns>An <see cref="ILogger"/> instance with a category name derived from the calling file and member.</returns>
+    public static ILogger CreateLogger(this WebApplication app, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerMemberName = "")
     {
         var factory = app.Services.GetRequiredService<ILoggerFactory>();
-        var categoryName = Path.GetFileNameWithoutExtension(callerFilePath);
+        var categoryName = GetCategoryName(callerFilePath, callerMemberName);
 
         return factory.CreateLogger(categoryName);
-    }
+    }        
 
-    private static string GetCategoryNameFromPath(string path)
+    private static string GetCategoryName(string callerFilePath, string callerMemberName)
     {
-        if (string.IsNullOrWhiteSpace(path))
-            return "Unknown";
-
-        return Path.GetFileNameWithoutExtension(path);
+        var className = Path.GetFileNameWithoutExtension(callerFilePath);
+        return $"{className}.{callerMemberName}";
     }
 }

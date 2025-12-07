@@ -15,26 +15,24 @@ public static class GeolocationDatabaseRegistrationExtensions
     /// Adds database services related to geolocation to the specified <see cref="IServiceCollection"/>.
     /// </summary>
     /// <param name="services">The collection of services in the application.</param>
-    /// <param name="configuration">The configuration of the application.</param>
-    /// <param name="email">The service for sending email notifications.</param>
+    /// <param name="configuration">The configuration of the application.</param>    
     /// <returns>The collection of services with added database services.</returns>
-    public static IServiceCollection AddGeolocationDatabase(this IServiceCollection services, IConfiguration configuration, IEmailService email)
+    public static IServiceCollection AddGeolocationDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        var logger = services.CreateAutoLogger();
-        var connectionString = configuration.GetConnectionString("Geolocation");
-
-        if (string.IsNullOrWhiteSpace(connectionString))
+        services.AddDbContext<GeolocationDbContext>((serviceProvider, options) =>
         {
-            string errorMessage = "Nelze získat connection string na připojení databáze Geolocation";           
+            var connectionString = configuration.GetConnectionString("Geolocation");
 
-            _ = email.SendErrorAsync(errorMessage, typeof(GeolocationDatabaseRegistrationExtensions), nameof(AddGeolocationDatabase));
-            logger.LogError(errorMessage);
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                string errorMessage = "Nelze získat connection string na připojení databáze Geolocation";
+                serviceProvider.CreateLogger().LogError(errorMessage);
+                var email = serviceProvider.GetRequiredService<IEmailService>();
+                _ = email.SendErrorAsync(errorMessage, typeof(GeolocationDatabaseRegistrationExtensions), nameof(AddGeolocationDatabase));
 
-            return services;
-        }
+                return;
+            }
 
-        services.AddDbContext<GeolocationDbContext>(options =>
-        {
             options.UseSqlServer(connectionString, opts =>
             {
                 opts.MigrationsHistoryTable("MigrationHistory_Geolocation");
@@ -52,25 +50,25 @@ public static class GeolocationDatabaseRegistrationExtensions
     /// Applies pending migrations to the database.
     /// </summary>
     /// <param name="app">The web application instance.</param>
-    /// <param name="email">The service for sending email notifications.</param>
     /// <returns>The configured web application instance.</returns>
-    public static WebApplication UseGeolocationDatabase(this WebApplication app, IEmailService email)
+    public static async Task<WebApplication> UseGeolocationDatabase(this WebApplication app)
     {
-        var logger = app.CreateAutoLogger();
         var isRunningAutomatedTest = app.ParseBoolEnvironmentVariable("IS_RUNNING_AUTOMATED_TEST");
 
         if (app.Environment.EnvironmentName != "IntegrationTests" && !isRunningAutomatedTest)
         {
+            using var scope = app.Services.CreateScope();
+            var email = scope.ServiceProvider.GetRequiredService<IEmailService>();
+
             try
             {
-                using var scope = app.Services.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<GeolocationDbContext>();
-                dbContext.Database.Migrate();
+                await dbContext.Database.MigrateAsync(app.Lifetime.ApplicationStopping);
             }
             catch (Exception ex)
             {
+                app.CreateLogger().LogError(ex.ToString());
                 _ = email.SendErrorAsync(ex.ToString());
-                logger.LogError(ex.ToString());
 
                 return app;
             }

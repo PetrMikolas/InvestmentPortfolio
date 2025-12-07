@@ -19,9 +19,9 @@ public static class ApiInvestmentsRegistrationExtensions
     /// <returns>The web application with mapped endpoints for investment operations.</returns>
     public static WebApplication MapInvestmentEndpoints(this WebApplication app)
     {
-        app.MapGet("investments", async (
-            [FromQuery(Name = "RefreshExchangeRates")] bool hasRefreshExchangeRates, 
-            [FromServices] IMediator mediator, 
+        app.MapGet("investments", [EndpointSummary("Get all investments")] async (
+            [FromQuery(Name = "RefreshExchangeRates")] bool hasRefreshExchangeRates,
+            [FromServices] IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             var query = new GetInvestmentsQuery(hasRefreshExchangeRates);
@@ -30,12 +30,11 @@ public static class ApiInvestmentsRegistrationExtensions
         })
         .WithTags("Investments")
         .WithName("GetInvestments")
-        .WithOpenApi(operation => new(operation) { Summary = "Get all investments" })
         .Produces<InvestmentsDto>(StatusCodes.Status200OK);
 
-        app.MapPost("investments", async (
-            [FromBody] InvestmentDto investmentDto, 
-            [FromServices] IMediator mediator, 
+        app.MapPost("investments", [EndpointSummary("Create an investment")] async (
+            [FromBody] InvestmentDto investmentDto,
+            [FromServices] IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             if (!IsValidInvestmentDto(investmentDto, HttpMethod.Post, out string error))
@@ -48,14 +47,13 @@ public static class ApiInvestmentsRegistrationExtensions
             return Results.Created($"investments/{cretedInvestmentId}", null);
         })
         .WithTags("Investments")
-        .WithName("CreateInvestment")
-        .WithOpenApi(operation => new(operation) { Summary = "Create an investment" })
+        .WithName("CreateInvestment")        
         .Produces(StatusCodes.Status201Created)
         .Produces(StatusCodes.Status400BadRequest);
 
-        app.MapPut("investments", async (
-            [FromBody] InvestmentDto investmentDto, 
-            [FromServices] IMediator mediator, 
+        app.MapPut("investments", [EndpointSummary("Update the investment")] async (
+            [FromBody] InvestmentDto investmentDto,
+            [FromServices] IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             if (!IsValidInvestmentDto(investmentDto, HttpMethod.Put, out string error))
@@ -75,15 +73,14 @@ public static class ApiInvestmentsRegistrationExtensions
             }
         })
         .WithTags("Investments")
-        .WithName("UpdateInvestment")
-        .WithOpenApi(operation => new(operation) { Summary = "Update the investment" })
+        .WithName("UpdateInvestment")        
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound);
 
-        app.MapDelete("investments/{id}", async (
-            [FromRoute] int id, 
-            [FromServices] IMediator mediator, 
+        app.MapDelete("investments/{id}", [EndpointSummary("Delete investment by ID")] async (
+            [FromRoute] int id,
+            [FromServices] IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             if (id <= 0)
@@ -103,8 +100,7 @@ public static class ApiInvestmentsRegistrationExtensions
             }
         })
         .WithTags("Investments")
-        .WithName("DeleteInvestment")
-        .WithOpenApi(operation => new(operation) { Summary = "Delete investment by ID" })
+        .WithName("DeleteInvestment")        
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status404NotFound);

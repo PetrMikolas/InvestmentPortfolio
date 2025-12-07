@@ -1,11 +1,9 @@
-﻿namespace InvestmentPortfolio.Sentry;
+﻿using InvestmentPortfolio.Helpers;
+
+namespace InvestmentPortfolio.Sentry;
 
 public static class SentryRegistrationExtensions
 {
-    private static readonly ILogger _logger = LoggerFactory
-        .Create(builder => builder.AddConsole().AddDebug())
-        .CreateLogger(typeof(SentryRegistrationExtensions));
-
     /// <summary>
     /// Adds Sentry services to the <see cref="IWebHostBuilder"/> using the provided configuration.
     /// </summary>
@@ -18,10 +16,15 @@ public static class SentryRegistrationExtensions
 
         if (string.IsNullOrWhiteSpace(dsn))
         {
-            _logger.LogWarning(
-                "The Sentry DSN is missing or empty. Without a valid DSN, Sentry will not be operational. " +
-                "Ensure that the DSN is specified in the appsettings.json file under the key 'SentryDsn'."
-            );
+            webHostBuilder.ConfigureLogging(logging =>
+            {
+                using var provider = logging.Services.BuildServiceProvider();
+
+                provider.CreateLogger().LogWarning(
+                    "The Sentry DSN is missing or empty. Without a valid DSN, Sentry will not be operational. " +
+                    "Ensure that the DSN is specified in the appsettings.json file under the key 'SentryDsn'."
+                );
+            });
 
             return webHostBuilder;
         }

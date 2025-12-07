@@ -17,8 +17,8 @@ public static class ApiGeolocationRegistrationExtensions
     /// <returns>The web application with mapped endpoints for geolocation operations.</returns>
     public static WebApplication MapGeolocationEndpoints(this WebApplication app)
     {
-        app.MapGet("geolocations", async (
-            [FromServices] IMediator mediator, 
+        app.MapGet("geolocations", [EndpointSummary("Get all geolocations")] async (
+            [FromServices] IMediator mediator,
             CancellationToken cancellationToken) =>
         {
             var query = new GetGeolocationsQuery();
@@ -27,7 +27,6 @@ public static class ApiGeolocationRegistrationExtensions
         })
         .WithTags("Geolocations")
         .WithName("GetGeolocations")
-        .WithOpenApi(operation => new(operation) { Summary = "Get all geolocations" })
         .Produces<IEnumerable<GeolocationDto>>(StatusCodes.Status200OK);
 
         return app;
