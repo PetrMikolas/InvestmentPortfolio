@@ -89,7 +89,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     // Handle exceptions and enforce HTTPS in production.
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    //app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
 
