@@ -47,10 +47,8 @@ public static class Helper
     /// <returns>An <see cref="ILogger"/> instance with a category name derived from the calling file and member.</returns>
     public static ILogger CreateLogger(this IServiceProvider provider, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerMemberName = "")
     {
-        var factory = provider.GetRequiredService<ILoggerFactory>();
-        var categoryName = GetCategoryName(callerFilePath, callerMemberName);
-
-        return factory.CreateLogger(categoryName);
+        var factory = provider.GetRequiredService<ILoggerFactory>();   
+        return CreateLoggerCore(factory, callerFilePath, callerMemberName);
     }
 
     /// <summary>
@@ -66,15 +64,15 @@ public static class Helper
     /// <returns>An <see cref="ILogger"/> instance with a category name derived from the calling file and member.</returns>
     public static ILogger CreateLogger(this WebApplication app, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerMemberName = "")
     {
-        var factory = app.Services.GetRequiredService<ILoggerFactory>();
-        var categoryName = GetCategoryName(callerFilePath, callerMemberName);
+        var factory = app.Services.GetRequiredService<ILoggerFactory>();    
+        return CreateLoggerCore(factory, callerFilePath, callerMemberName);
+    }
 
-        return factory.CreateLogger(categoryName);
-    }        
-
-    private static string GetCategoryName(string callerFilePath, string callerMemberName)
+    private static ILogger CreateLoggerCore(ILoggerFactory factory, string callerFilePath, string callerMemberName)
     {
         var className = Path.GetFileNameWithoutExtension(callerFilePath);
-        return $"{className}.{callerMemberName}";
+        var categoryName = $"{className}.{callerMemberName}";
+
+        return factory.CreateLogger(categoryName);
     }
 }
