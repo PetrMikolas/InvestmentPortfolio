@@ -11,7 +11,7 @@
                 <RadzenDataGrid Data="@_data" TItem="Investment" GridLines="DataGridGridLines.Both" AllowPaging="true" AllowSorting="true" class="rz-unselectable-text">
                     <Columns>
 
-                        <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Width="130px" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Width="135px" TextAlign="TextAlign.Center">
                             <HeaderTemplate>Datum přidání<br>investice</HeaderTemplate>
                             <Template Context="investment">
                                 <div style="text-align:center">
@@ -37,7 +37,7 @@
                             </Template>
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Investment" Property="CurrencyCode" Title="Měna" Width="77px" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn TItem="Investment" Property="CurrencyCode" Title="Měna" Width="80px" TextAlign="TextAlign.Center">
                             <HeaderTemplate>Kód<br>měny</HeaderTemplate>
                             <Template Context="investment">
                                 <div style="text-align:center">
@@ -64,7 +64,7 @@
                             </Template>
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Width="107px" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Width="110px" TextAlign="TextAlign.Center">
                             <HeaderTemplate>Výkonnost<br>Kč</HeaderTemplate>
                             <Template Context="investment">
                                 <div style="text-align:right; @Helper.GetStyleColorByValue(investment.PerformanceCzk)">
@@ -73,7 +73,7 @@
                             </Template>
                         </RadzenDataGridColumn>
 
-                        <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Width="106px" TextAlign="TextAlign.Center">
+                        <RadzenDataGridColumn TItem="Investment" Property="ValueCzk" Width="110px" TextAlign="TextAlign.Center">
                             <HeaderTemplate>Výkonnost<br>%</HeaderTemplate>
                             <Template Context="investment">
                                 <div style="text-align:right; @Helper.GetStyleColorByValue(investment.PerformancePercentage)">
