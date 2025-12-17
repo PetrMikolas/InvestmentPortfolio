@@ -11,6 +11,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Runner memory baseline
+      run: |
+        echo "=== RUNNER BASELINE ==="
+        free -h
+        swapon --show || true
+        df -h
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
@@ -18,12 +25,29 @@ jobs:
         registry: dockerhub.petrmikolas.cz
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+  
+    - name: Build Docker image (with memory diagnostics)
+      run: |
+        echo "=== BEFORE DOCKER BUILD ==="
+        free -h
 
-    - name: Build Docker image
-      run: docker build . -f ./InvestmentPortfolio/Dockerfile -t dockerhub.petrmikolas.cz/investmentportfolio:latest
+        docker build \
+          --progress=plain \
+          . \
+          -f ./InvestmentPortfolio/Dockerfile \
+          -t dockerhub.petrmikolas.cz/investmentportfolio:latest
+
+        echo "=== AFTER DOCKER BUILD ==="
+        free -h
 
     - name: Push Docker image to Docker Hub
       run: docker push dockerhub.petrmikolas.cz/investmentportfolio:latest
+
+    - name: Runner memory after build
+      run: |
+        echo "=== RUNNER AFTER BUILD ==="
+        free -h
+        docker system df
 
     - name: Copy compose.yaml to NAS
       uses: appleboy/scp-action@v0.1.4
@@ -44,7 +68,7 @@ jobs:
         port: ${{ secrets.NAS_PORT }}
         script: |
           set -e
-          
+      
           echo "Changing to target directory on NAS"
           cd /volume1/docker/investmentportfolio
 
