@@ -5,6 +5,7 @@
 @inject NotificationService NotificationService
 @inject IApiService ApiService
 @inject IExportService ExportService
+@inject PersistentComponentState PersistentComponentState
 @rendermode InteractiveAuto
 
 <PageTitle>Investiční portfolio</PageTitle>
@@ -87,6 +88,9 @@
     private bool _isOpenModalPerformance;
     private bool _isOpenModalInvestment;
     private bool _isOpenModalDeleteConfirmationDialog;
+    private bool _isPersistenceRegistered;
+
+    private const string INVESTMENTS_PERSIST_KEY = "investments";
 
     private InvestmentDto? _modalInvestmentData;
     private InvestmentsDto _investments = new();
@@ -314,18 +318,36 @@
             _alertMessages.Clear();
             _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
         }
-    }   
+    }       
 
     protected override async Task OnInitializedAsync()
-    {   
+    {
+        if (PersistentComponentState.TryTakeFromJson<InvestmentsDto>(INVESTMENTS_PERSIST_KEY, out var cachedInvestments) && cachedInvestments is not null)
+        {
+            _investments = cachedInvestments;
+            return;
+        }
+
         try
         {
             _investments = await ApiService.GetInvestmentsAsync();
             CheckExistsExchangeRates(_investments);
+
+            if (!_isPersistenceRegistered)
+            {
+                PersistentComponentState.RegisterOnPersisting(PersistInvestments);
+                _isPersistenceRegistered = true;
+            }
         }
         catch (Exception ex)
         {
-            _alertMessages.Add(new AlertMessage {Style = AlertStyle.Danger, Text = ex.Message });
-        }        
+            _alertMessages.Add(new AlertMessage { Style = AlertStyle.Danger, Text = ex.Message });
+        }
+    }
+
+    private Task PersistInvestments()
+    {
+        PersistentComponentState.PersistAsJson(INVESTMENTS_PERSIST_KEY, _investments);
+        return Task.CompletedTask;
     }
 }
