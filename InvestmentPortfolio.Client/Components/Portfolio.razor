@@ -22,7 +22,7 @@
         </RadzenStack>
     </RadzenStack>
 
-    <div class="responsive-columns" style="min-width:715px; ">    
+    <div class="responsive-columns" style="min-width:715px; ">
         <div style="width:715px; margin-left:auto; margin-right:auto">
             <PortfolioTable Investments="@_investments.Items"
                             OnEdit="@OpenModalInvestmentEdit"
@@ -30,7 +30,14 @@
         </div>
 
         <div style="width:715px; padding:0px 16px 16px 0px; margin:auto">
-            <PortfolioPieChart Investments="@_investments.Items" OnInvestmentSummary="@ViewInvestmentSummary" />
+            @if (!_isChartReady)
+            {
+                <LoadingSpinner />
+            }
+            else
+            {
+                <PortfolioPieChart Investments="@_investments.Items" OnInvestmentSummary="@ViewInvestmentSummary" />
+            }
         </div>
     </div>
 
@@ -82,13 +89,14 @@
     <RadzenComponents />
 </div>
 
-@code {   
+@code {
     private bool _isVisibleLoader;
     private bool _isOpenModalExchangeRates;
     private bool _isOpenModalPerformance;
     private bool _isOpenModalInvestment;
     private bool _isOpenModalDeleteConfirmationDialog;
     private bool _isPersistenceRegistered;
+    private bool _isChartReady;
 
     private const string INVESTMENTS_PERSIST_KEY = "investments";
 
@@ -245,12 +253,12 @@
     private void ShowNotification(string summary, string detail = "")
     {
         var message = new NotificationMessage()
-            {
-                Style = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);",
-                Severity = NotificationSeverity.Success,
-                Summary = summary,
-                Detail = detail
-            };
+        {
+            Style = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);",
+            Severity = NotificationSeverity.Success,
+            Summary = summary,
+            Detail = detail
+        };
 
         NotificationService.Notify(message);
     }
@@ -264,7 +272,7 @@
         _alertMessages.Clear();
         _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Info, Text = summary });
     }
-        
+
     /// <summary>
     /// Checks if exchange rates exist and displays a warning if not.
     /// </summary>
@@ -318,7 +326,7 @@
             _alertMessages.Clear();
             _alertMessages.Add(new AlertMessage() { Style = AlertStyle.Danger, Text = ex.Message });
         }
-    }       
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -349,5 +357,14 @@
     {
         PersistentComponentState.PersistAsJson(INVESTMENTS_PERSIST_KEY, _investments);
         return Task.CompletedTask;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isChartReady = true;
+            StateHasChanged();
+        }
     }
 }
