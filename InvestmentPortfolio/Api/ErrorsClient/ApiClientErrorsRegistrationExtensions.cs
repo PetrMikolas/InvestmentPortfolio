@@ -1,4 +1,5 @@
-﻿using InvestmentPortfolio.Services.Email;
+﻿using InvestmentPortfolio.Helpers;
+using InvestmentPortfolio.Services.Email;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InvestmentPortfolio.Api.ErrorsClient;
@@ -25,10 +26,7 @@ public static class ApiClientErrorsRegistrationExtensions
                 return Results.BadRequest("HTTP Request Body musí obsahovat chybovou zprávu.");
             }
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Error: {errorMessage}");
-            Console.ResetColor();
-
+            app.CreateLogger().LogError("Client Error: {ErrorMessage}", errorMessage);            
             _ = email.SendErrorAsync(errorMessage, cancellationToken);
 
             return Results.NoContent();

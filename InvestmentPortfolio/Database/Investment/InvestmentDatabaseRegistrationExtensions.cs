@@ -1,6 +1,6 @@
-﻿using InvestmentPortfolio.Helpers;
+﻿using InvestmentPortfolio.Exceptions;
+using InvestmentPortfolio.Helpers;
 using InvestmentPortfolio.Repositories.Investment;
-using InvestmentPortfolio.Services.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -21,20 +21,13 @@ public static class InvestmentDatabaseRegistrationExtensions
     {
         if (configuration["environment"] is not "IntegrationTests")
         {
-            services.AddDbContext<InvestmentDbContext>((serviceProvider, options) =>
+            var connectionString = configuration.GetConnectionString("Investment");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ConnectionStringNotFoundException("Nelze získat connection string na připojení databáze Investment");
+
+            services.AddDbContext<InvestmentDbContext>(options =>
             {
-                var connectionString = configuration.GetConnectionString("Investment");
-
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    string errorMessage = "Nelze získat connection string na připojení databáze Investment";
-                    serviceProvider.CreateLogger().LogError(errorMessage);
-                    var email = serviceProvider.GetRequiredService<IEmailService>();
-                    _ = email.SendErrorAsync(errorMessage, typeof(InvestmentDatabaseRegistrationExtensions), nameof(AddInvestmentDatabase));
-
-                    throw new InvalidOperationException(errorMessage);
-                }
-
                 options.UseSqlServer(connectionString, opts =>
                 {
                     opts.MigrationsHistoryTable("MigrationHistory_Investment");
@@ -42,7 +35,6 @@ public static class InvestmentDatabaseRegistrationExtensions
             });
         }
 
-        services.AddDatabaseDeveloperPageExceptionFilter();
         services.RemoveAll<IInvestmentRepository>();
         services.AddScoped<IInvestmentRepository, InvestmentRepository>();
 
@@ -61,19 +53,16 @@ public static class InvestmentDatabaseRegistrationExtensions
         if (app.Environment.EnvironmentName is not "IntegrationTests" && !isRunningAutomatedTest)
         {
             using var scope = app.Services.CreateScope();
-            var email = scope.ServiceProvider.GetRequiredService<IEmailService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<InvestmentDbContext>();
 
             try
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<InvestmentDbContext>();
                 await dbContext.Database.MigrateAsync(app.Lifetime.ApplicationStopping);
             }
             catch (Exception ex)
             {
-                app.CreateLogger().LogError(ex.ToString());
-                _ = email.SendErrorAsync(ex.ToString());
-
-                return app;
+                app.CreateLogger().LogError(ex, "Database migration failed");
+                throw;
             }
         }
 

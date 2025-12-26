@@ -14,13 +14,13 @@ internal sealed class ExchangeRateService(HttpClient httpClient, IConfiguration 
 {
     public async Task<ExchangeRates> GetAsync(CancellationToken cancellationToken)
     {
-        var url = configuration["UrlApiCnb"];
+        var url = configuration["CnbExchangeRatesApiUrl"];
         var exchangeRates = new ExchangeRates();
 
         if (string.IsNullOrEmpty(url))
         {
             logger.LogError("Nelze načíst URL API ČNB");
-            _ = email.SendErrorAsync("Nelze načíst URL API ČNB", typeof(ExchangeRateService), nameof(GetAsync), cancellationToken);
+            _ = email.SendErrorWithContextAsync("Nelze načíst URL API ČNB", cancellationToken: cancellationToken);
             return exchangeRates;
         }
 
@@ -32,7 +32,7 @@ internal sealed class ExchangeRateService(HttpClient httpClient, IConfiguration 
         catch (Exception ex)
         {
             logger.LogError(ex, "Nepodařilo se připojit k API ČNB");
-            _ = email.SendErrorAsync(ex.ToString(), typeof(ExchangeRateService), nameof(GetAsync), cancellationToken);
+            _ = email.SendErrorAsync(ex.ToString(), cancellationToken);
         }
 
         return exchangeRates;
@@ -52,7 +52,7 @@ internal sealed class ExchangeRateService(HttpClient httpClient, IConfiguration 
             using var reader = new StreamReader(stream);
 
             // načte 1. řádek tabulky obsahující datum
-            var row = reader.ReadLine() ?? throw new ArgumentNullException(nameof(reader), "Nepodařilo se načíst směnné kurzy");
+            var row = reader.ReadLine() ?? throw new InvalidDataException("Nepodařilo se načíst směnné kurzy");
             exchangeRates.Date = row.Split('#').First().Trim();
 
             // načte 2. řádek tabulky se kterým nepracujeme
@@ -75,7 +75,7 @@ internal sealed class ExchangeRateService(HttpClient httpClient, IConfiguration 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex.ToString());
+            logger.LogError(ex, "Chyba při čtení devizových kurzů.");
             _ = email.SendErrorAsync(ex.ToString());
         }
 

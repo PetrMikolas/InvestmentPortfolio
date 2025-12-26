@@ -69,7 +69,7 @@ builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddHttpClient<IApiClient, ApiClient>(config =>
-    config.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!));
+    config.BaseAddress = new Uri(builder.Configuration["BaseUrl"]!));
 
 var app = builder.Build();
 

@@ -1,6 +1,6 @@
-﻿using InvestmentPortfolio.Helpers;
+﻿using InvestmentPortfolio.Exceptions;
+using InvestmentPortfolio.Helpers;
 using InvestmentPortfolio.Repositories.Geolocation;
-using InvestmentPortfolio.Services.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -19,27 +19,19 @@ public static class GeolocationDatabaseRegistrationExtensions
     /// <returns>The collection of services with added database services.</returns>
     public static IServiceCollection AddGeolocationDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<GeolocationDbContext>((serviceProvider, options) =>
+        var connectionString = configuration.GetConnectionString("Geolocation");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new ConnectionStringNotFoundException("Nelze získat connection string na připojení databáze Geolocation");
+
+        services.AddDbContext<GeolocationDbContext>(options =>
         {
-            var connectionString = configuration.GetConnectionString("Geolocation");
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                string errorMessage = "Nelze získat connection string na připojení databáze Geolocation";
-                serviceProvider.CreateLogger().LogError(errorMessage);
-                var email = serviceProvider.GetRequiredService<IEmailService>();
-                _ = email.SendErrorAsync(errorMessage, typeof(GeolocationDatabaseRegistrationExtensions), nameof(AddGeolocationDatabase));
-
-                return;
-            }
-
             options.UseSqlServer(connectionString, opts =>
             {
                 opts.MigrationsHistoryTable("MigrationHistory_Geolocation");
             });
         });
 
-        services.AddDatabaseDeveloperPageExceptionFilter();
         services.RemoveAll<IGeolocationRepository>();
         services.AddScoped<IGeolocationRepository, GeolocationRepository>();
 
@@ -58,20 +50,19 @@ public static class GeolocationDatabaseRegistrationExtensions
         if (app.Environment.EnvironmentName != "IntegrationTests" && !isRunningAutomatedTest)
         {
             using var scope = app.Services.CreateScope();
-            var email = scope.ServiceProvider.GetRequiredService<IEmailService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<GeolocationDbContext>();
 
             try
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<GeolocationDbContext>();
                 await dbContext.Database.MigrateAsync(app.Lifetime.ApplicationStopping);
             }
             catch (Exception ex)
             {
-                app.CreateLogger().LogError(ex.ToString());
-                _ = email.SendErrorAsync(ex.ToString());
-
-                return app;
+                app.CreateLogger().LogError(ex, "Database migration failed");
+                throw;
             }
+
+            return app;
         }
 
         return app;

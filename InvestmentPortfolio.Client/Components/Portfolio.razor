@@ -99,6 +99,7 @@
     private bool _isChartReady;
 
     private const string INVESTMENTS_PERSIST_KEY = "investments";
+    private const string ALERT_MESSAGES_PERSIST_KEY = "alertMessages";
 
     private InvestmentDto? _modalInvestmentData;
     private InvestmentsDto _investments = new();
@@ -330,6 +331,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (PersistentComponentState.TryTakeFromJson<List<AlertMessage>>(ALERT_MESSAGES_PERSIST_KEY, out var cachedAlertMessages) && cachedAlertMessages is not null)
+        {
+            _alertMessages = cachedAlertMessages;
+        }
+
         if (PersistentComponentState.TryTakeFromJson<InvestmentsDto>(INVESTMENTS_PERSIST_KEY, out var cachedInvestments) && cachedInvestments is not null)
         {
             _investments = cachedInvestments;
@@ -356,6 +362,8 @@
     private Task PersistInvestments()
     {
         PersistentComponentState.PersistAsJson(INVESTMENTS_PERSIST_KEY, _investments);
+        PersistentComponentState.PersistAsJson(ALERT_MESSAGES_PERSIST_KEY, _alertMessages);
+
         return Task.CompletedTask;
     }
 
