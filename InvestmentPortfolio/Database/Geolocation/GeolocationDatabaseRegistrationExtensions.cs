@@ -3,6 +3,7 @@ using InvestmentPortfolio.Helpers;
 using InvestmentPortfolio.Repositories.Geolocation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SqlCommandMonitor.Interceptor;
 
 namespace InvestmentPortfolio.Database.Geolocation;
 
@@ -24,12 +25,16 @@ public static class GeolocationDatabaseRegistrationExtensions
         if (string.IsNullOrWhiteSpace(connectionString))
             throw new ConnectionStringNotFoundException("Nelze získat connection string na připojení databáze Geolocation");
 
-        services.AddDbContext<GeolocationDbContext>(options =>
+        services.AddDbContext<GeolocationDbContext>((sp, options) =>
         {
+            var interceptor = sp.GetRequiredService<DbCommandMonitorInterceptor>();
+
             options.UseSqlServer(connectionString, opts =>
             {
                 opts.MigrationsHistoryTable("MigrationHistory_Geolocation");
             });
+
+            options.AddInterceptors(interceptor);
         });
 
         services.RemoveAll<IGeolocationRepository>();

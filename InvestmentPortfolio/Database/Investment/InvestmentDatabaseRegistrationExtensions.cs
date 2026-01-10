@@ -3,6 +3,7 @@ using InvestmentPortfolio.Helpers;
 using InvestmentPortfolio.Repositories.Investment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SqlCommandMonitor.Interceptor;
 
 namespace InvestmentPortfolio.Database.Investment;
 
@@ -26,12 +27,16 @@ public static class InvestmentDatabaseRegistrationExtensions
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new ConnectionStringNotFoundException("Nelze získat connection string na připojení databáze Investment");
 
-            services.AddDbContext<InvestmentDbContext>(options =>
+            services.AddDbContext<InvestmentDbContext>((sp, options) =>
             {
+                var interceptor = sp.GetRequiredService<DbCommandMonitorInterceptor>();
+
                 options.UseSqlServer(connectionString, opts =>
                 {
                     opts.MigrationsHistoryTable("MigrationHistory_Investment");
                 });
+
+                options.AddInterceptors(interceptor);
             });
         }
 

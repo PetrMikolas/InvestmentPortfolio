@@ -15,6 +15,7 @@ using InvestmentPortfolio.Services.Geolocation;
 using InvestmentPortfolio.Services.Investment;
 using Microsoft.AspNetCore.DataProtection;
 using Radzen;
+using SqlCommandMonitor.Extensions;
 using static InvestmentPortfolio.Services.Email.EmailService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,8 @@ builder.WebHost.AddSentry(builder.Configuration);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddSqlCommandMonitor(builder.Configuration);
 
 builder.Services.AddScoped<RequestInfoMiddleware>();
 builder.Services.AddMemoryCache();
@@ -117,5 +120,7 @@ await app.UseGeolocationDatabase();
 app.MapInvestmentEndpoints();
 app.MapGeolocationEndpoints();
 app.MapClientErrorEndpoints();
+
+app.UseSqlCommandMonitor();
 
 app.Run();
