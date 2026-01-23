@@ -35,7 +35,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Sentry.AspNetCore" Version="6.0.0" />
-		<PackageReference Include="SqlCommandMonitor" Version="1.0.47" />
+		<PackageReference Include="SqlCommandMonitor" Version="1.0.83" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
 	</ItemGroup>
 
