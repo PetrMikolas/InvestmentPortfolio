@@ -3,7 +3,7 @@ using InvestmentPortfolio.Helpers;
 using InvestmentPortfolio.Repositories.Investment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SqlCommandMonitor.Interceptor;
+using SqlCommandMonitor.Extensions;
 
 namespace InvestmentPortfolio.Database.Investment;
 
@@ -29,14 +29,12 @@ public static class InvestmentDatabaseRegistrationExtensions
 
             services.AddDbContext<InvestmentDbContext>((sp, options) =>
             {
-                var interceptor = sp.GetRequiredService<DbCommandMonitorInterceptor>();
-
                 options.UseSqlServer(connectionString, opts =>
                 {
                     opts.MigrationsHistoryTable("MigrationHistory_Investment");
                 });
 
-                options.AddInterceptors(interceptor);
+                options.ApplySqlCommandMonitorInterceptor(sp);
             });
         }
 

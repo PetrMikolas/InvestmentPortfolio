@@ -3,7 +3,7 @@ using InvestmentPortfolio.Helpers;
 using InvestmentPortfolio.Repositories.Geolocation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SqlCommandMonitor.Interceptor;
+using SqlCommandMonitor.Extensions;
 
 namespace InvestmentPortfolio.Database.Geolocation;
 
@@ -27,14 +27,12 @@ public static class GeolocationDatabaseRegistrationExtensions
 
         services.AddDbContext<GeolocationDbContext>((sp, options) =>
         {
-            var interceptor = sp.GetRequiredService<DbCommandMonitorInterceptor>();
-
             options.UseSqlServer(connectionString, opts =>
             {
                 opts.MigrationsHistoryTable("MigrationHistory_Geolocation");
             });
 
-            options.AddInterceptors(interceptor);
+            options.ApplySqlCommandMonitorInterceptor(sp);
         });
 
         services.RemoveAll<IGeolocationRepository>();

@@ -15,6 +15,7 @@ using InvestmentPortfolio.Services.Geolocation;
 using InvestmentPortfolio.Services.Investment;
 using Microsoft.AspNetCore.DataProtection;
 using Radzen;
+using SqlCommandMonitor.Dashboard.Extensions;
 using SqlCommandMonitor.Extensions;
 using static InvestmentPortfolio.Services.Email.EmailService;
 
@@ -28,7 +29,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+// Register SQL Command Monitor services.
 builder.Services.AddSqlCommandMonitor(builder.Configuration);
+builder.Services.AddSqlCommandMonitorDashboard(builder.Configuration);
 
 builder.Services.AddScoped<RequestInfoMiddleware>();
 builder.Services.AddMemoryCache();
@@ -112,6 +115,9 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(InvestmentPortfolio.Client._Imports).Assembly);
 
+app.UseSqlCommandMonitor();
+app.UseSqlCommandMonitorDashboard();
+
 // Apply database migrations.
 await app.UseInvestmentDatabase();
 await app.UseGeolocationDatabase();
@@ -121,6 +127,5 @@ app.MapInvestmentEndpoints();
 app.MapGeolocationEndpoints();
 app.MapClientErrorEndpoints();
 
-app.UseSqlCommandMonitor();
 
 app.Run();
