@@ -36,8 +36,8 @@
 		</PackageReference>
 		<PackageReference Include="Sentry.AspNetCore" Version="6.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
-        <PackageReference Include="SqlCommandMonitor" Version="1.0.6" />
-        <PackageReference Include="SqlCommandMonitor.Dashboard" Version="1.0.92" />
+        <PackageReference Include="SqlCommandMonitor" Version="1.0.8" />
+        <PackageReference Include="SqlCommandMonitor.Dashboard" Version="1.0.93" />
 	</ItemGroup>
 
 	<ItemGroup>
